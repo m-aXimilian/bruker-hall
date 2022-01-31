@@ -8,6 +8,8 @@ sys.path.append(parentdir)
 
 import src.helpers as h
 import src.LookupFit as lookup
+import src.HallMeasurement as hall
+
 
 def main():
     logging.basicConfig(filename='../log/hall.log', filemode='w', level=logging.DEBUG)
@@ -17,15 +19,19 @@ def main():
     up = lookup.LookupFit(data["rampup"][1], data["rampup"][0], 3)
     down = lookup.LookupFit(data["rampdown"][1], data["rampdown"][0],3)
 
-    plt.plot(data["rampup"][1],data["rampup"][0], "bo", label="data up")
-    plt.plot(H,up.getValue(H), "--b", label="fit up")
+    plt.plot(data["rampup"][1],data["rampup"][0], "bo", label="data ramp up")
+    plt.plot(H,up.getValue(H), "--b", label="fit ramp up")
 
-    plt.plot(data["rampdown"][1],data["rampdown"][0], "ro", label="data down")
-    plt.plot(H,down.getValue(H), "--r", label="fit down")
+    plt.plot(data["rampdown"][1],data["rampdown"][0], "ro", label="data ramp down")
+    plt.plot(H,down.getValue(H), "--r", label="fit ramp down")
 
-    plt.grid(which='major',axis='y')
+    plt.grid(which='major',axis='both')
+    plt.xlabel("H-field (mT)")
+    plt.ylabel("Voltage (V)")
     plt.legend(loc="best")
     plt.legend()
+    plt.title("Field-set functions from Lookup-tables")
+    plt.tight_layout()
     plt.show()
 
 
@@ -34,6 +40,8 @@ def main():
     for v in test:
         print("{}mT correspond to: \n\tup: {}V\n\tdown:{}"
               .format(v, up.getValue(v), down.getValue(v)))
+
+    tst = hall.HallHandler()
 
 if __name__ == "__main__":
     main()
