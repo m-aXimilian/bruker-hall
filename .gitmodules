@@ -1,0 +1,3 @@
+[submodule "fmr-py"]
+	path = fmr-py
+	url = https://gitlab.lrz.de/m-aximilian/fmr-py.git

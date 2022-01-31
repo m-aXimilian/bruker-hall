@@ -1,0 +1,9 @@
+#+title: Bruker Hall measurements
+#+subtitle: using fmr-py as submodule
+
+
+* Usage
+  #+begin_src sh
+  git clone --recurse-submodules https://gitlab.lrz.de/m-aximilian/bruker-hall.git
+  cd bruker-hall
+  #+end_src
