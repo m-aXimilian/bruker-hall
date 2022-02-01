@@ -39,9 +39,9 @@ def main():
 
     for v in test:
         print("{}mT correspond to: \n\tup: {}V\n\tdown:{}"
-              .format(v, up.getValue(v), down.getValue(v)))
+              .format(v, up.getValue(v), down.getValue(v)))    
 
-    tst = hall.HallHandler()
+
 
 if __name__ == "__main__":
     main()
