@@ -14,6 +14,24 @@ import src.HallMeasurement as hall
 def main():
     hm = hall.HallMeasurement()
     print(hm.tasks)
+    print(
+        hm.tasks["xantrex-writer"].task.channel_names
+    )
+    print(
+        hm.tasks["pid-writer"].task.channel_names
+    )
+    print(
+        hm.tasks["reader"].task.channel_names
+    )
+    hm.tasks["xantrex-writer"].singleWrite(0)
+    hm.tasks["pid-writer"].singleWrite(0)
+
+    print(hm.tasks["reader"].singleRead())
+
+    hm.tasks["xantrex-writer"].singleWrite(0)
+    hm.tasks["pid-writer"].singleWrite(0)
+
+
 
 if __name__ == "__main__":
     main()
