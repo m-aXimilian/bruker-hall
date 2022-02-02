@@ -19,17 +19,20 @@ def main():
         logging.basicConfig(filename='log/hall.log', filemode='w', level=logging.DEBUG)
     hm = hall.HallMeasurement()
 
+    tmp_read = hm.readVolt(hm.tasks["reader"])[hm.measure_index]*100
+    hm.writeVolt(hm.tasks["pid-writer"],0)
+    print(tmp_read)
+    print(hm.measure_index)
+    # res = [[]]
+    # for i, v in enumerate(hm.set_field):
+    #     tmp_read = hm.readVolt(hm.tasks["reader"])[1]*100
+    #     hm.writeVolt(hm.tasks["pid-writer"],round(hm.pid_set[i], 4))
+    #     while abs(tmp_read - v) > 0.5:
+    #         sleep(0.5)
+    #         tmp_read = hm.readVolt(hm.tasks["reader"])[1]*100
+    #     res[0].append(tmp_read)
     
-    res = [[]]
-    for i, v in enumerate(hm.set_field):
-        tmp_read = hm.readVolt(hm.tasks["reader"])[1]*100
-        hm.writeVolt(hm.tasks["pid-writer"],round(hm.pid_set[i], 4))
-        while abs(tmp_read - v) > 0.5:
-            sleep(0.5)
-            tmp_read = hm.readVolt(hm.tasks["reader"])[1]*100
-        res[0].append(tmp_read)
-    
-    print(res)
+    # print(res)
 
     # print(hm.tasks)
     # print(

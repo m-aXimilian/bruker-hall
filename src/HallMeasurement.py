@@ -14,11 +14,15 @@ import visa_devices as dev
 import src.WaveForm as wave
 import src.helpers as helper
 import src.LookupFit as look
+import src.Lockin as sr830
 
 
 
 class DaqHallTask(dev.NIUSB6259):
     """Additions to the NIUSB6259 class."""
+    def __init__(self) -> None:
+        super().__init__()
+        self.task_name = self.task.channel_names
 
     def singleRead(self):
         """Read a single value from all ai-channels."""
@@ -42,7 +46,12 @@ class DaqHallTask(dev.NIUSB6259):
 
 class HallHandler:
     def __init__(self):
-        pass
+        if os.name == 'posix':
+            self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
+        else:
+            self.measure = helper.loadYAMLConfig("config/measurement.yaml")
+        self.steps = self.measure["wave"]["N"]
+
     
         
 class HallMeasurement:
@@ -56,11 +65,13 @@ class HallMeasurement:
             self.lookup = helper.loadYAMLConfig("config/H-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
+        self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
+
         self.__generateLookups()
         self.__generateWave()
         self.__makeSetVXantrex()
         self.__makeSetVPID()
-        # self.__generateTasks()
+        self.__generateTasks()
 
 
     @staticmethod
@@ -70,13 +81,13 @@ class HallMeasurement:
         Args:
         	t (DaqHallTask): task
 		v (num): value to write"""
-        logging.info("Wrote {}V to on task {}".format(v, t.task.channel_names))
+        logging.info("Wrote {}V to on task {}".format(v, t.task_name))
         t.singleWrite(v)
 
 
     @staticmethod
     def readVolt(t):
-        logging.info("Reading from task {}".format(t.task.channel_names))
+        logging.info("Reading from task {}".format(t.task_name))
         return t.singleRead()
 
 
@@ -86,12 +97,19 @@ class HallMeasurement:
             self.params["devices"]["daq-card"]["id"],
             self.params["devices"]["daq-card"]["ai"], _type="ai"
         )
+        tmp = None
+        for i, v in enumerate(self.params["devices"]["daq-card"]["ai"]):
+            if v.find("measure") != -1:
+                tmp = i
+        self.measure_index = tmp
+        self.tasks["reader"].task_name = self.tasks["reader"].task.channel_names
         
         for k, v in self.params["devices"]["daq-card"]["ao"].items():
             self.tasks.update({"{}-writer".format(k): DaqHallTask()})
             self.tasks["{}-writer".format(k)].add_channels(
                 self.params["devices"]["daq-card"]["id"],
                 v, _type="ao")
+            self.tasks["{}-writer".format(k)].task_name = self.tasks["{}-writer".format(k)].task.channel_names
 
 
     def __generateLookups(self):

@@ -7,3 +7,5 @@ settings:
   delta-fine: 10
   delta-start: 5
   max-inc: 10
+lockin:
+  f: 833.33
