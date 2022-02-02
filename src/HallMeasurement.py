@@ -102,6 +102,11 @@ class HallMeasurement:
             if v.find("measure") != -1:
                 tmp = i
         self.measure_index = tmp
+
+        if self.measure_index == None:
+            logging.error("In the list of AI-channels one with <>-\"measure\" must be provided!")
+            raise TypeError("No index found for a measurement channel.")
+        
         self.tasks["reader"].task_name = self.tasks["reader"].task.channel_names
         
         for k, v in self.params["devices"]["daq-card"]["ao"].items():
