@@ -15,6 +15,8 @@ import src.WaveForm as wave
 import src.helpers as helper
 import src.LookupFit as look
 
+
+
 class DaqHallTask(dev.NIUSB6259):
     """Additions to the NIUSB6259 class."""
 
@@ -42,8 +44,7 @@ class HallHandler:
     def __init__(self):
         pass
     
-    
-    
+        
 class HallMeasurement:
     def __init__(self):
         if os.name == 'posix':
@@ -59,7 +60,7 @@ class HallMeasurement:
         self.__generateWave()
         self.__makeSetVXantrex()
         self.__makeSetVPID()
-        self.__generateTasks()
+        # self.__generateTasks()
 
 
     @staticmethod
@@ -139,7 +140,9 @@ class HallMeasurement:
             if v > self.set_field[i+1]:
                 tmp[i] = self.xantrex_lookup["rampdown"].getValue(v)
 
-        self.xantrex_set = tmp
+        # scale the xantrex voltate tmp with its maximum range (150V)
+        # to the 10V output range of the DAQ card
+        self.xantrex_set = tmp / self.params["devices"]["xantrex"]["range"]["high"] * 10
 
     def __makeSetVPID(self):
         self.pid_set = self.pid_lookup.scaler(self.set_field)

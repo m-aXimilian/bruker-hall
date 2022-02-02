@@ -24,10 +24,10 @@ def main():
 
     color = "tab:blue"
     ax2 = ax1.twinx()
-    ax2.set_ylim(-1,110)
+    ax2.set_ylim(-0.1,11)
     ax2.set_ylabel("Set Voltage (V)", color=color)
     ax2.plot(hm.xantrex_set, color=color, label="Set Volt Xantrex")
-    ax2.plot(hm.pid_set, color=color, linestyle='dashed', label="Set Volt PID")
+    ax2.plot(hm.pid_set, color=color, linestyle='dotted', label="Set Volt PID")
     ax2.tick_params(axis='y', labelcolor=color)
 
     ax1.grid()

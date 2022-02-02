@@ -1,3 +1,4 @@
+#+startup: indent
 #+title: Bruker Hall measurements
 #+subtitle: using fmr-py as submodule
 
@@ -10,3 +11,4 @@
 
 * Physics
 - Hall Sensor: 1V := 100mT
+- Xantrex voltage range: 0-150V
