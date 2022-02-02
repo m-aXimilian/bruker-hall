@@ -7,3 +7,6 @@
   git clone --recurse-submodules https://gitlab.lrz.de/m-aximilian/bruker-hall.git
   cd bruker-hall
   #+end_src
+
+* Physics
+- Hall Sensor: 1V := 100mT

@@ -3,5 +3,5 @@ devices:
     id: "GPIB0::8"
   daq-card:
     id: "Dev1"
-    ai: {'short': 'ai3', 'field-is-measure': 'ai2'}
+    ai: {'short': 'ai3', 'field-is-measure': 'ai7'}
     ao: {'xantrex': 'ao2', 'pid': 'ao1'}

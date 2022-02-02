@@ -52,13 +52,14 @@ class HallMeasurement:
             self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.params = helper.loadYAMLConfig("config/devices.yaml")
-            self.lookup = helper.loadYAMLConfig("H-field-lookup.yaml")
+            self.lookup = helper.loadYAMLConfig("config/H-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
         self.__generateLookups()
         self.__generateWave()
         self.__makeSetVXantrex()
         self.__makeSetVPID()
+        self.__generateTasks()
 
 
     @staticmethod
@@ -68,13 +69,13 @@ class HallMeasurement:
         Args:
         	t (DaqHallTask): task
 		v (num): value to write"""
-        logging.info("Wrote {}V to on task".format(v, t))
+        logging.info("Wrote {}V to on task {}".format(v, t.task.channel_names))
         t.singleWrite(v)
 
 
     @staticmethod
     def readVolt(t):
-        logging.info("Reading from task {}".format(t))
+        logging.info("Reading from task {}".format(t.task.channel_names))
         return t.singleRead()
 
 
@@ -117,7 +118,7 @@ class HallMeasurement:
         tmp = self.wave_handle.triangle()
         check = 0
         for i in range(len(tmp)-1):
-            inc = int(abs(tmp[i+1] - tmp[i]))
+            inc = round(abs(tmp[i+1] - tmp[i]), 3)
             if inc > check:
                 check = inc
 
