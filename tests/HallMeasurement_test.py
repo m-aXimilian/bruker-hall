@@ -12,25 +12,27 @@ import src.HallMeasurement as hall
 
 
 def main():
+    logging.basicConfig(filename='../log/hall.log', filemode='w', level=logging.DEBUG)
     hm = hall.HallMeasurement()
-    print(hm.tasks)
-    print(
-        hm.tasks["xantrex-writer"].task.channel_names
-    )
-    print(
-        hm.tasks["pid-writer"].task.channel_names
-    )
-    print(
-        hm.tasks["reader"].task.channel_names
-    )
-    hm.tasks["xantrex-writer"].singleWrite(0)
-    hm.tasks["pid-writer"].singleWrite(0)
+    # print(hm.tasks)
+    # print(
+    #     hm.tasks["xantrex-writer"].task.channel_names
+    # )
+    # print(
+    #     hm.tasks["pid-writer"].task.channel_names
+    # )
+    # print(
+    #     hm.tasks["reader"].task.channel_names
+    # )
+    # hm.tasks["xantrex-writer"].singleWrite(0)
+    # hm.tasks["pid-writer"].singleWrite(0)
 
-    print(hm.tasks["reader"].singleRead())
+    # print(hm.tasks["reader"].singleRead())
 
-    hm.tasks["xantrex-writer"].singleWrite(0)
-    hm.tasks["pid-writer"].singleWrite(0)
-
+    # hm.tasks["xantrex-writer"].singleWrite(0)
+    # hm.tasks["pid-writer"].singleWrite(0)
+    # plt.plot(hm.set_field, label="set field")
+    
 
 
 if __name__ == "__main__":

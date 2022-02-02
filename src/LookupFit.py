@@ -32,21 +32,12 @@ class LookupFit:
 
 class LinearFit:
     """Linear scale Lookup function.
+    
+    Args: 
+    	scale (num):	scale factor
     """
-    def  __init__(self):
-        self.scale = None
-
-    @property
-    def scale(self):
-        return self.scale
-
-    @scale.setter
-    def scale(self, v):
-        self.scale = v
-
-    @scale.getter
-    def scale(self):
-        return self.scale
+    def  __init__(self, _scale = 0):
+        self.scale = _scale
 
     def scaler(self, v):
         """Scales with the scale property.

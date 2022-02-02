@@ -1,0 +1,9 @@
+wave:
+  form: tirangle
+  zero: 0
+  amp: 1000
+  N: 1000
+settings:
+  delta-fine: 50
+  delta-start: 5
+  max-inc: 10
