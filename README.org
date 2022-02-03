@@ -18,14 +18,14 @@ on B-field measurements for different power supply voltages.
 #+name: fit-fuctions
 #+caption: Fit functions for a rampup form 0 to 1T and 
 #+caption: rampdown from 1 to 0T.
-[[file:doc/field-set-functions.png][sef-fuctions]]
+file:doc/field-set-functions.png
 The PID-controller value is just a scaled value based on the ramp
 wave.
 See figure [[ramp-set]]  for an example for a triangular shaped ramp from 0 to 1T
 #+name: ramp-set
 #+caption: Example set value functions for xantrex and PID 
 #+caption: with a ramp from 0 to 1T.
-[[file:doc/field-set-voltages_0-1T-ramp.png][ramp-set]]
+file:doc/field-set-voltages_0-1T-ramp.png
 
 ** Measurement
 The SR8320 sources a sinus voltage, which generates a ``constant''
