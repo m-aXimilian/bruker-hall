@@ -18,7 +18,7 @@ def main():
     ax1.set_ylim(-10,1100)
     color = "tab:red"
     ax1.set_xlabel("index")
-    ax1.set_ylabel("H-Field (mT)", color=color)
+    ax1.set_ylabel("B-Field (mT)", color=color)
     ax1.plot(hm.set_field, color=color, linestyle='dashed', label="Set Field")
     ax1.tick_params(axis='y', labelcolor=color)
 

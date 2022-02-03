@@ -26,7 +26,7 @@ def main():
     plt.plot(H,down.getValue(H), "--r", label="fit ramp down")
 
     plt.grid(which='major',axis='both')
-    plt.xlabel("H-field (mT)")
+    plt.xlabel("B-field (mT)")
     plt.ylabel("Voltage (V)")
     plt.legend(loc="best")
     plt.legend()
