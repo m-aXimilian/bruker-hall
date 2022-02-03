@@ -2,6 +2,39 @@
 #+title: Bruker Hall measurements
 #+subtitle: using fmr-py as submodule
 
+* Description
+Controlled ramping of a B-field function and measuring
+Lockin-Amplifier parameters. Can be used for *Hall-effect* and *MR*
+measurements.
+
+** H-Field Ramp
+The waveform for the ramp is generated automatically by means of the
+parameters (start, stop, increment, etc.) in [[file:config/measurement.yaml][measurement config]] file.
+Based on this wave 2 set-values are generated for
+1. the xantrex power supply and
+2. the PID-controller.
+The first is taken from a fit-function (see figure [[fit-fuctions]]) based
+on B-field measurements for different power supply voltages.
+#+name: fit-fuctions
+#+caption: Fit functions for a rampup form 0 to 1T and 
+#+caption: rampdown from 1 to 0T.
+[[file:doc/field-set-functions.png][sef-fuctions]]
+The PID-controller value is just a scaled value based on the ramp
+wave.
+See figure [[ramp-set]]  for an example for a triangular shaped ramp from 0 to 1T
+#+name: ramp-set
+#+caption: Example set value functions for xantrex and PID 
+#+caption: with a ramp from 0 to 1T.
+[[file:doc/field-set-voltages_0-1T-ramp.png][ramp-set]]
+
+** Measurement
+The SR8320 sources a sinus voltage, which generates a ``constant''
+current by means of a high resistance (kΩ). The input is locked in at
+the source frequency. For every value in of the waveform array
+- the respective B-field is set,
+- the process waits until the B-field is within the boundary
+  ``delta-start'' configured in [[file:config/measurement.yaml][measurement config]]
+- a number of N measurements is recorded and written to a file
 
 * Usage
   #+begin_src sh
@@ -9,6 +42,14 @@
   cd bruker-hall
   #+end_src
 
-* Physics
+* Notes and Parameters
+
+** Parameters
 - Hall Sensor: 1V := 100mT
 - Xantrex voltage range: 0-150V
+  
+* Hardware
+- 2T Bruker Magnet
+- [[https://www.manualslib.com/manual/633965/Xantrex-Xfr-6-200.html#product-XFR%20150-8][xantrex XFR 150-8]]
+- [[https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf][Stanford Research SR830 Lockin Amplifier]]
+- Audio Amplifier with PID-controller
