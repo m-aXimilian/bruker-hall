@@ -1,8 +1,15 @@
 from ast import arg
 import src.HallMeasurement as hall
+from enum import IntFlag
 
 import threading
 import time
+
+from concurrent import futures
+
+class WRITEStatus(IntFlag):
+    OK = 0
+    TIMEOUT = 1
 
 
 def thrd_f(res, i):
@@ -10,18 +17,18 @@ def thrd_f(res, i):
     res[i] = time.time_ns()
 
 
-def main():
-    d = { 'a': 10, 'b': 20, 'c': 30}
-    tmp = None
-    for i, v in enumerate(d):
-        print(v)
-        if v.find("b") != -1:
-            tmp=i
-    
-    print(tmp)
-                
+def rtrn_wr():
+    return WRITEStatus.TIMEOUT
 
-    # res = [None]*2   
+
+def main():
+
+    res = [None]*2
+    with futures.ThreadPoolExecutor(max_workers=2) as e:
+        e.submit(thrd_f, res, 0)
+        e.submit(thrd_f, res, 1)
+        
+
     
     # t1 = threading.Thread(target=thrd_f, args=(res, 0))
     # t2 = threading.Thread(target=thrd_f, args=(res, 1))
@@ -30,14 +37,15 @@ def main():
     # t2.start()
     # t1.join()
     # t2.join()
+    print(rtrn_wr() == WRITEStatus.TIMEOUT)
 
-    # print(res[1]-res[0])
+    print(res[1]-res[0])
 
-    # frst = time.time_ns()
-    # time.sleep(1)
-    # scnd = time.time_ns()
+    frst = time.time_ns()
+    time.sleep(1)
+    scnd = time.time_ns()
 
-    # print(scnd-frst)
+    print(scnd-frst)
 
 if __name__ == "__main__":
     main()

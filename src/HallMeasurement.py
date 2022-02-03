@@ -1,9 +1,11 @@
 import os, sys
 import logging
 import importlib
-import threading
 import numpy as np
+import time
 
+from enum import IntFlag
+from concurrent import futures
 from pymeasure.instruments.srs import SR830
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -15,6 +17,11 @@ import src.WaveForm as wave
 import src.helpers as helper
 import src.LookupFit as look
 import src.Lockin as sr830
+
+
+class READStatus(IntFlag):
+    OK = 0
+    TIMEOUT = 7
 
 
 
@@ -50,7 +57,39 @@ class HallHandler:
             self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
+        
         self.steps = self.measure["wave"]["N"]
+        self.m_hall = HallMeasurement()
+        self.last_b = 0
+
+
+    def reach_field_fine(self, b) -> READStatus:
+        c = abs(b - self.last_b)
+        if c > self.measure["settings"]["max-inc"]:
+            e = "Field increment with {}mT higher than the allowed {}mT".format(c, self.measure["settings"]["max-inc"])
+            logging.error(e)
+            raise TypeError(e)
+
+        self.last_b = b
+
+        delta_tmp = abs(b - self.m_hall.read_field())
+        start = time.time()
+        
+        # 1. add write out 2 set values
+
+        while delta_tmp > self.measure["settings"]["delta-start"]:
+            timeout = (time.time() - start) > self.measure["settings"]["timeout"]
+            if timeout:
+                return READStatus.TIMEOUT
+
+            time.sleep(self.measure["settings"]["wait-b"])
+            delta_tmp = abs(b - self.m_hall.read_field())
+
+
+
+    def __write_out(self):
+        pass
+    
 
     
         
@@ -91,6 +130,21 @@ class HallMeasurement:
         return t.singleRead()
 
 
+    def read_field(self):
+        """Reads a single value, selects the measure_index and scales by pid-scale from 
+        the lookup config file.
+
+        Returns: B-field value in mT
+        """
+        if self.tasks == None:
+            e = "No task to read B-field from"
+            logging.error(e)
+            raise TypeError(e)
+
+        return readVolt(self.tasks["reader"])[self.measure_index] / self.lookup["pid-scale"]
+
+
+
     def __generateTasks(self):
         self.tasks = {"reader": DaqHallTask()}
         self.tasks["reader"].add_channels(
@@ -104,17 +158,36 @@ class HallMeasurement:
         self.measure_index = tmp
 
         if self.measure_index == None:
-            logging.error("In the list of AI-channels one with <>-\"measure\" must be provided!")
-            raise TypeError("No index found for a measurement channel.")
+            e = "In the list of AI-channels one with <>-\"measure\" must be provided!"
+            logging.error(e)
+            raise TypeError(e)
         
         self.tasks["reader"].task_name = self.tasks["reader"].task.channel_names
         
         for k, v in self.params["devices"]["daq-card"]["ao"].items():
-            self.tasks.update({"{}-writer".format(k): DaqHallTask()})
-            self.tasks["{}-writer".format(k)].add_channels(
+            tmp_name = "{}-writer".format(k)
+            self.tasks.update({tmp_name: DaqHallTask()})
+            self.tasks[tmp_name].add_channels(
                 self.params["devices"]["daq-card"]["id"],
                 v, _type="ao")
-            self.tasks["{}-writer".format(k)].task_name = self.tasks["{}-writer".format(k)].task.channel_names
+            self.tasks[tmp_name].task_name = self.tasks[tmp_name].task.channel_names
+
+
+        self.pid_index = None
+        self.xantrex_index = None
+
+        for i, v in enumerate(self.params["devices"]["daq-card"]["ao"]):
+            if v.find("xantrex") != -1:
+                self.xantrex_index = i
+            if v.find("pid") != -1:
+                self.pid_index = i
+
+        if self.pid_index == None or self.xantrex_index == None:
+            e = "In the list of AO-channels one with \"xantrex\" and one with \"pid\" must be provided!"
+            logging.error(e)
+            raise TypeError(e)
+
+
 
 
     def __generateLookups(self):
@@ -147,8 +220,9 @@ class HallMeasurement:
                 check = inc
 
         if check > self.measure["settings"]["max-inc"]:
-            logging.error("Field increment with {}mT higher than the allowed {}mT".format(check, self.measure["settings"]["max-inc"]))
-            raise TypeError("Field increment too high ({}mT)! \naborting...".format(check))
+            e = "Field increment with {}mT higher than the allowed {}mT".format(check, self.measure["settings"]["max-inc"])
+            logging.error(e)
+            raise TypeError(e)
         
         logging.info("H-field vector ok. Dim: {}, increment: {}".format(tmp.shape, check))
         self.set_field = tmp

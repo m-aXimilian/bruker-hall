@@ -4,8 +4,10 @@ wave:
   amp: 1000
   N: 400
 settings:
-  delta-fine: 10
-  delta-start: 5
-  max-inc: 10
+  delta-fine: 10 # (mT) WIP delta for PID-enable
+  delta-start: 5 # (mT) delta to start measure
+  max-inc: 10  # (mT) set field delta
+  wait-b: 0.5  # (s) wait until next iteration
+  timeout: 30  # (s) until field reached
 lockin:
   f: 833.33
