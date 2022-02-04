@@ -1,5 +1,6 @@
 from ast import arg
 import src.HallMeasurement as hall
+import src.helpers as helper
 from enum import IntFlag
 
 import threading
@@ -7,28 +8,9 @@ import time
 
 from concurrent import futures
 
-class WRITEStatus(IntFlag):
-    OK = 0
-    TIMEOUT = 1
-
-class STATUS(IntFlag):
-    ERROR = -1
-    OK = 0
-    TIMEOUT = 7
-
-
-class FIELDdir(IntFlag):
-    DOWN = 0
-    UP = 1
-
 def thrd_f(res, i):
     time.sleep(1)
     res[i] = time.time_ns()
-
-
-def rtrn_wr():
-    return WRITEStatus.TIMEOUT
-
 
 def main():
 
@@ -37,7 +19,8 @@ def main():
         e.submit(thrd_f, res, 0)
         e.submit(thrd_f, res, 1)
         
-
+    param = helper.loadYAMLConfig("config/devices.yaml")
+    print(param)
     
     # t1 = threading.Thread(target=thrd_f, args=(res, 0))
     # t2 = threading.Thread(target=thrd_f, args=(res, 1))
@@ -46,10 +29,6 @@ def main():
     # t2.start()
     # t1.join()
     # t2.join()
-    o = rtrn_wr()
-
-    print(isinstance(o, WRITEStatus))
-    print("%s not of %f" % (o, 1.2334))
 
     print(res[1]-res[0])
 

@@ -98,6 +98,8 @@ class HallHandler:
         self.m_hall.writeVolt(self.m_hall.tasks["xantrex-writer"], xan_set)
         self.m_hall.writeVolt(self.m_hall.tasks ["pid-writer"], pid_set)
 
+        logging.debug("%f to xantrex AO, %f to pid AO" % (xan_set, pid_set))
+
         while delta_tmp > self.measure["settings"]["delta-start"]:
             timeout = (time.time() - start) > self.measure["settings"]["timeout"]
             if timeout:
@@ -152,7 +154,7 @@ class HallMeasurement:
             self.lookup = helper.loadYAMLConfig("config/H-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
-        self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
+        #self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
 
         self.__generateLookups()
         self.__generateWave()
@@ -168,12 +170,12 @@ class HallMeasurement:
         Args:
         	t (:class`~DaqHallTask`): task
 		v (num): value to write"""
-        if abs(v) > self.params["devices"]["daq-card"]["analog-range"]:
+        if abs(v) > 10:
             e = "Value %f is beyond the analog channel range." % v
             logging.error(e)
             raise ValueError(e)
         
-        logging.info("Wrote {}V to on task {}".format(v, t.task_name))
+        logging.debug("Wrote {}V to on task {}".format(v, t.task_name))
         t.singleWrite(v)
 
 
@@ -183,7 +185,7 @@ class HallMeasurement:
         
         Args:
         	t (:class`~DaqHallTask`): task to read from"""
-        logging.info("Reading from task {}".format(t.task_name))
+        logging.debug("Reading from task {}".format(t.task_name))
         return t.singleRead()
 
 
@@ -198,7 +200,7 @@ class HallMeasurement:
             logging.error(e)
             raise TypeError(e)
 
-        return readVolt(self.tasks["reader"])[self.measure_index] / self.lookup["pid-scale"]
+        return self.readVolt(self.tasks["reader"])[self.measure_index] / self.lookup["pid-scale"]
 
 
 
