@@ -5,6 +5,7 @@ devices:
     id: "Dev1"
     ai: {'short': 'ai3', 'field-is-measure': 'ai7'}
     ao: {'xantrex': 'ao2', 'pid': 'ao1'}
+    analog-range: 10	# in V 
   xantrex:
     range:
       low: 0

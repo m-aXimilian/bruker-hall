@@ -11,6 +11,15 @@ class WRITEStatus(IntFlag):
     OK = 0
     TIMEOUT = 1
 
+class STATUS(IntFlag):
+    ERROR = -1
+    OK = 0
+    TIMEOUT = 7
+
+
+class FIELDdir(IntFlag):
+    DOWN = 0
+    UP = 1
 
 def thrd_f(res, i):
     time.sleep(1)
@@ -37,7 +46,10 @@ def main():
     # t2.start()
     # t1.join()
     # t2.join()
-    print(rtrn_wr() == WRITEStatus.TIMEOUT)
+    o = rtrn_wr()
+
+    print(isinstance(o, WRITEStatus))
+    print("%s not of %f" % (o, 1.2334))
 
     print(res[1]-res[0])
 
