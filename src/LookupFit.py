@@ -14,7 +14,7 @@ class LookupFit:
         self._y = np.array(y)
 
         if not self._x.shape == self._y.shape:
-            raise ValueError("Array shapes do not match")
+            raise ValueError("Array shapes do not match ({} and {})".format(self._x.shape, self._y.shape))
 
         self._deg = deg
         self._co = np.polyfit(self._x, self._y, self._deg)

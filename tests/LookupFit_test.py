@@ -12,17 +12,23 @@ import src.HallMeasurement as hall
 
 
 def main():
-    logging.basicConfig(filename='../log/hall.log', filemode='w', level=logging.DEBUG)
-    data = h.loadYAMLConfig("../config/H-field-lookup.yaml")
+    # logging.basicConfig(filename='../log/hall.log', filemode='w', level=logging.DEBUG)
+    data = h.loadYAMLConfig("../config/B-field-lookup.yaml")
     H = np.linspace(0, 1100, 1000)
 
-    up = lookup.LookupFit(data["rampup"][1], data["rampup"][0], 3)
-    down = lookup.LookupFit(data["rampdown"][1], data["rampdown"][0],3)
+    up_x = np.array(data["rampup"][1])*100
+    up_y = np.array(data["rampup"][0])
 
-    plt.plot(data["rampup"][1],data["rampup"][0], "bo", label="data ramp up")
+    down_x = np.array(data["rampdown"][1])*100
+    down_y = np.array(data["rampdown"][0])
+
+    up = lookup.LookupFit(np.array(data["rampup"][1])*100, up_y, 3)
+    down = lookup.LookupFit(down_x, down_y,3)
+
+    plt.plot(np.array(data["rampup"][1])*100,up_y, "bo", label="data ramp up")
     plt.plot(H,up.getValue(H), "--b", label="fit ramp up")
 
-    plt.plot(data["rampdown"][1],data["rampdown"][0], "ro", label="data ramp down")
+    plt.plot(down_x,down_y, "ro", label="data ramp down")
     plt.plot(H,down.getValue(H), "--r", label="fit ramp down")
 
     plt.grid(which='major',axis='both')

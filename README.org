@@ -16,12 +16,12 @@ Based on this wave 2 set-values are generated for
 The first is taken from a fit-function (see figure [[fit-fuctions]]) based
 on B-field measurements for different power supply voltages.
 #+name: fit-fuctions
-#+html: <p align="center"><img src="doc/field-set-functions.png" width="60%"></p>
+#+html: <p align="center"><img src="doc/field-set-functions_many-points.png" width="60%"></p>
 The PID-controller value is just a scaled value based on the ramp
 wave.
 See figure [[ramp-set]]  for an example for a triangular shaped ramp from 0 to 1T
 #+name: ramp-set
-#+html: <p align="center"><img src="doc/field-set-voltages_0-1T-ramp.png" width="60%"></p>
+#+html: <p align="center"><img src="doc/field-set-voltages_0-1T-ramp_many-points.png" width="60%"></p>
 
 
 ** Measurement

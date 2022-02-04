@@ -147,11 +147,11 @@ class HallMeasurement:
     def __init__(self):
         if os.name == 'posix':
             self.params = helper.loadYAMLConfig("../config/devices.yaml")
-            self.lookup = helper.loadYAMLConfig("../config/H-field-lookup.yaml")
+            self.lookup = helper.loadYAMLConfig("../config/B-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.params = helper.loadYAMLConfig("config/devices.yaml")
-            self.lookup = helper.loadYAMLConfig("config/H-field-lookup.yaml")
+            self.lookup = helper.loadYAMLConfig("config/B-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
         #self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
@@ -160,7 +160,7 @@ class HallMeasurement:
         self.__generateWave()
         self.__makeSetVXantrex()
         self.__makeSetVPID()
-        self.__generateTasks()
+        # self.__generateTasks()
 
 
     @staticmethod
@@ -265,12 +265,12 @@ class HallMeasurement:
         (:class`~LookupFit.LinearFit`)."""
         self.xantrex_lookup = {
             "rampup": look.LookupFit(
-                self.lookup["rampup"][1],
-                self.lookup["rampup"][0],
+                np.array(self.lookup["rampup"][1])/self.lookup["pid-scale"],
+                np.array(self.lookup["rampup"][0]),
                 self.lookup["deg"]),
             "rampdown": look.LookupFit(
-                self.lookup["rampdown"][1],
-                self.lookup["rampdown"][0],
+                np.array(self.lookup["rampdown"][1])/self.lookup["pid-scale"],
+                np.array(self.lookup["rampdown"][0]),
                 self.lookup["deg"]
                                )}
 
