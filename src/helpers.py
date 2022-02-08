@@ -25,12 +25,14 @@ def write_data(f, d, c="", m=""):
     	d (array like): data to write
     	c (string): comma separated column names (must match the columns of the data) defaults to \"\"
     	m (string): metadata to write to the header defaults to \"\""""
-    ex = os.path.isfile(_f)
+
+    ex = os.path.isfile(f)
+    os.makedirs(os.path.dirname(f), exist_ok=True)
     with open(f, 'a') as f_:
         if ex:
             np.savetxt(f_, np.array(d), delimiter=',')
         else:
-            logging.info("Created file {}".format(os.abspath(f)))
+            logging.info("Created file {}".format(os.path.abspath(f)))
             np.savetxt(f_, np.array(d), delimiter=',',
                        header="{m}\n{c}".format(m=m, c=c))
             
