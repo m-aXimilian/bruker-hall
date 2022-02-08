@@ -15,6 +15,12 @@ Based on this wave 2 set-values are generated for
 2. the PID-controller.
 The first is taken from a fit-function (see figure [[fit-fuctions]]) based
 on B-field measurements for different power supply voltages.
+
+#+BEGIN_QUOTE
+The fit-function is generated from the data provided in ``B-field-lookup.yaml''. The order of the fit-function can be passed by setting the ~deg~ parameter.
+If not provided, a fit of the first order is calculated.
+#+END_QUOTE
+
 #+name: fit-fuctions
 #+html: <p align="center"><img src="doc/field-set-functions_many-points.png" width="60%"></p>
 The PID-controller value is just a scaled value based on the ramp
@@ -52,18 +58,36 @@ the source frequency. For every value in of the waveform array
 - Audio Amplifier with PID-controller
 
 * Tests 
-** Up to 500mT ramp
+** Up to 500mT ramp -- 2022/02/04
 
-#+name: parameters
+#+name: parameters-500mt
 | zero        | 0        |
 | amp         | 500      |
 | N           | 2000     |
 | delta-fine  | 10       |
 | delta-start | 1        |
+| real-inc    | 0.5      |
 | max-inc     | 5        |
 | wait-b      | 0.5      |
 | timeout     | 20       |
 
 No issues on rampup. 
 On rampdown, the PID current was contantly in the order of 3 to 4A.
+
+** Up to 100mT ramp -- 2022/02/08
+
+#+name: parameters-100mT
+#+name: parameters-500mt
+| zero        | 0        |
+| amp         | 100      |
+| N           | 10000     |
+| delta-fine  | 10       |
+| delta-start | 1        |
+| real-inc    | 0.02      |
+| max-inc     | 5        |
+| wait-b      | 0.5      |
+| timeout     | 20       |
+
+No issues! Auxilary current below 1A for the whole time and no timeout!
+
 

@@ -38,7 +38,7 @@ class HallMeasurement:
         self.__generateWave()
         self.__makeSetVXantrex()
         self.__makeSetVPID()
-        # self.__generateTasks()
+        self.__generateTasks()
 
 
     @staticmethod

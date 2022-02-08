@@ -9,7 +9,7 @@ sys.path.append(parentdir)
 
 import src.helpers as helper
 import src.LookupFit as lookup
-import src.HallMeasurement as hall
+import src.HallHandler as hall
 
 if __name__ == "__main__":
     logging.basicConfig(filename='log/hall-handler-test.log', filemode='w', level=logging.INFO)

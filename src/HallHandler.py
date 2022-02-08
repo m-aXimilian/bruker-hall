@@ -1,11 +1,14 @@
+from locale import currency
 import os, sys
 import logging
+import time
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
 sys.path.append(parentdir + "/fmr-py/src")
 
 from src.HallMeasurement import HallMeasurement
+import src.helpers as helper
 from src.States import STATUS, DIRECTION
 
 
@@ -41,10 +44,12 @@ class HallHandler:
 
         self.last_b = b
 
-        delta_tmp = abs(b - self.m_hall.read_field())
+        self.current_field = self.m_hall.read_field()
+        delta_tmp = abs(b - self.current_field)
         start = time.time()
 
         xan_set = self.m_hall.single_xanterx_set(b, direction)
+        time.sleep(b/100)
         pid_set = self.m_hall.single_pid_set(b)
 
         self.m_hall.writeVolt(self.m_hall.tasks["xantrex-writer"], xan_set)
@@ -59,7 +64,8 @@ class HallHandler:
                 return STATUS.TIMEOUT
 
             time.sleep(self.measure["settings"]["wait-b"])
-            delta_tmp = abs(b - self.m_hall.read_field())
+            self.current_field = self.m_hall.read_field()
+            delta_tmp = abs(b - self.current_field)
 
         logging.info("Reached set field of %f mT" % b)
         return STATUS.OK
