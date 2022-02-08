@@ -37,8 +37,9 @@ def main():
     plt.title("Set values Xantrex + PID range 0 to 1T")
     plt.show()
 
-    print(hm.xantrex_set)
+    print(hm.pid_lookup.scaler(100))
     print(hm.xantrex_lookup["rampup"].getValue(100))
+
 
 
 if __name__ == "__main__":
