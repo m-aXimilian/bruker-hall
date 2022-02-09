@@ -15,6 +15,12 @@ Based on this wave 2 set-values are generated for
 2. the PID-controller.
 The first is taken from a fit-function (see figure [[fit-fuctions]]) based
 on B-field measurements for different power supply voltages.
+
+#+BEGIN_QUOTE
+The fit-function is generated from the data provided in ``B-field-lookup.yaml''. The order of the fit-function can be passed by setting the ~deg~ parameter.
+If not provided, a fit of the first order is calculated.
+#+END_QUOTE
+
 #+name: fit-fuctions
 #+html: <p align="center"><img src="doc/field-set-functions_many-points.png" width="60%"></p>
 The PID-controller value is just a scaled value based on the ramp
@@ -22,6 +28,22 @@ wave.
 See figure [[ramp-set]]  for an example for a triangular shaped ramp from 0 to 1T
 #+name: ramp-set
 #+html: <p align="center"><img src="doc/field-set-voltages_0-1T-ramp_many-points.png" width="60%"></p>
+
+** Bruker time-constant
+Needed to prevent runaways of the is value that must be compensated by the PID-controller and result in (too) high currents.
+This happens when the set values are increased too fast for the Bruker magnet to follow (main coil). 
+The time-constant describes the time it takes the main coil to reach a new set value. It is calculated in s/mT and can be scaled 
+by the respective step size of a measurement. The scaled value should be awaited between subsequent set values.
+A time-constant of *0.8s/mT* follows from a field-ramp measurement form 0 to 600mT in 2mT steps.
+
+#+BEGIN_QUOTE
+The time-constant was calculated by ramping the B-field with the xantrex power supply only. It is assumed that a new set value 
+is reached when two subsequent (200ms apart from one another) B-field measurements differ by less than 0.1mT. This time was recorded and taken as a basis for 
+the calculation.
+#+END_QUOTE
+
+#+name: bruker-time-const
+#+html: <p align="center"><img src="doc/bruker_time-constant.png" width="60%"></p>
 
 
 ** Measurement
@@ -51,19 +73,6 @@ the source frequency. For every value in of the waveform array
 - [[https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf][Stanford Research SR830 Lockin Amplifier]]
 - Audio Amplifier with PID-controller
 
-* Tests 
-** Up to 500mT ramp
 
-#+name: parameters
-| zero        | 0        |
-| amp         | 500      |
-| N           | 2000     |
-| delta-fine  | 10       |
-| delta-start | 1        |
-| max-inc     | 5        |
-| wait-b      | 0.5      |
-| timeout     | 20       |
 
-No issues on rampup. 
-On rampdown, the PID current was contantly in the order of 3 to 4A.
 

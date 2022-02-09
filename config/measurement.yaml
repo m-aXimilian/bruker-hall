@@ -1,13 +1,14 @@
 wave:
   form: tirangle
   zero: 0
-  amp: 1000
+  amp: 500
   N: 1000
 settings:
   delta-fine: 10 # (mT) WIP delta for PID-enable
   delta-start: 1 # (mT) delta to start measure
-  max-inc: 5  # (mT) set field delta
+  max-inc: 2  # (mT) set field delta
   wait-b: 0.5  # (s) wait until next iteration
   timeout: 20  # (s) until field reached
+  bruker-const: 0.8 # (s/mT) time-constant of the main coils
 lockin:
   f: 833.33
