@@ -3,6 +3,7 @@ import os, sys
 import logging
 import time
 import numpy as np
+from time import strftime
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -26,12 +27,13 @@ class TimeConstant(HallHandler):
 
     def timing_loop(self):
         res = []
+        upper = round(max(self.m_hall.set_field))
         for v in self.m_hall.set_field:
             print("reaching {:10.3f}".format(v), end="\r")
             tmp = [self.set_xantrex(v), v]
             res.append(tmp)
         
-        helper.write_data("tests/results/bruker-time-constant.csv", np.array(res), "reached-at,set-val")
+        helper.write_data("tests/results/{}bruker-time-constant_to{}mT.csv".format(strftime("%Y-%m-%d_%H-%M-%S"), upper), np.array(res), "reached-at,set-val")
             
             
             

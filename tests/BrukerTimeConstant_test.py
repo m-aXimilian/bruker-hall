@@ -27,7 +27,7 @@ def step(a, lim):
     return r
 
 def eval():
-    data = np.genfromtxt("results/bruker-time-constant.csv", delimiter=",", skip_header=1, names=True)
+    data = np.genfromtxt("tests/results/2022-02-09_15-50-08bruker-time-constant_to599mT.csv", delimiter=",", skip_header=1, names=True)
     steps = np.array(step(data["setval"], 0.5))
     step_mean = steps.mean()
     hist_dat = data["reachedat"][20:-1]
@@ -35,7 +35,7 @@ def eval():
     md = median(hist_dat)
 
     # plt.plot(data["setval"],data["reachedat"])
-    plt.title("Reaching times for {:.0f}mT steps".format(step_mean))
+    plt.title("Reaching times for {:.0f}mT steps\nmax(B) = {}mT".format(step_mean, round(max(data["setval"]))))
     plt.xlabel("time/s")
     plt.ylabel("counts")
     plt.hist(hist_dat, bins=20)
@@ -43,8 +43,9 @@ def eval():
     plt.axvline(md, color='b', linestyle='dashed')
     min_y, max_y = plt.ylim()
 
-    plt.text(me*1.1, max_y*0.9, "Mean {:.1f}".format(me))
-    plt.text(me*1.1, max_y*0.85, "Median {:.1f}".format(md), color='b')
+    plt.text(me*1.2, max_y*0.9, "Mean {:.1f}s -> {:.1f}s/mT".format(me, me/step_mean))
+    plt.text(me*1.2, max_y*0.85, "Median {:.1f}s -> {:.1f}s/mT".format(md, md/step_mean), color='b')
+    plt.tight_layout()
     plt.show()
 
 if __name__ == "__main__":
