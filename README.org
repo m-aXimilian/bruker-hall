@@ -31,7 +31,7 @@ See figure [[ramp-set]]  for an example for a triangular shaped ramp from 0 to 1
 
 ** Bruker time-constant
 Needed to prevent runaways of the is value that must be compensated by the PID-controller and result in (too) high currents.
-This happens when the set values are increased to fast for the Bruker magnet to follow (main coil). 
+This happens when the set values are increased too fast for the Bruker magnet to follow (main coil). 
 The time-constant describes the time it takes the main coil to reach a new set value. It is calculated in s/mT and can be scaled 
 by the respective step size of a measurement. The scaled value should be awaited between subsequent set values.
 A time-constant of *0.8s/mT* follows from a field-ramp measurement form 0 to 600mT in 2mT steps.
