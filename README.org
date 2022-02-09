@@ -38,7 +38,7 @@ A time-constant of *0.8s/mT* follows from a field-ramp measurement form 0 to 600
 
 #+BEGIN_QUOTE
 The time-constant was calculated by ramping the B-field with the xantrex power supply only. It is assumed that a new set value 
-is reached when two subsequent (200ms) B-field measurements differ by less than 0.1mT. This time was recorded and taken as a basis for 
+is reached when two subsequent (200ms apart from one another) B-field measurements differ by less than 0.1mT. This time was recorded and taken as a basis for 
 the calculation.
 #+END_QUOTE
 
