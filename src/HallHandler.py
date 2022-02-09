@@ -46,17 +46,17 @@ class HallHandler:
 
         self.current_field = self.m_hall.read_field()
         delta_tmp = abs(b - self.current_field)
-        start = time.time()
 
         xan_set = self.m_hall.single_xanterx_set(b, direction)
-        time.sleep(b/100)
         pid_set = self.m_hall.single_pid_set(b)
+        time.sleep(self.measure["settings"]["bruker-const"]*c)
 
         self.m_hall.writeVolt(self.m_hall.tasks["xantrex-writer"], xan_set)
         self.m_hall.writeVolt(self.m_hall.tasks ["pid-writer"], pid_set)
 
         logging.debug("%f to xantrex AO, %f to pid AO" % (xan_set, pid_set))
-
+        
+        start = time.time()
         while delta_tmp > self.measure["settings"]["delta-start"]:
             timeout = (time.time() - start) > self.measure["settings"]["timeout"]
             if timeout:
@@ -67,7 +67,7 @@ class HallHandler:
             self.current_field = self.m_hall.read_field()
             delta_tmp = abs(b - self.current_field)
 
-        logging.info("Reached set field of %f mT" % b)
+        logging.info("Reached set field of {:10.2f} mT".format(b))
         return STATUS.OK
 
 

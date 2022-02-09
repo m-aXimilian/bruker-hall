@@ -73,37 +73,6 @@ the source frequency. For every value in of the waveform array
 - [[https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf][Stanford Research SR830 Lockin Amplifier]]
 - Audio Amplifier with PID-controller
 
-* Tests 
-** Up to 500mT ramp -- 2022/02/04
 
-#+name: parameters-500mt
-| zero        | 0        |
-| amp         | 500      |
-| N           | 2000     |
-| delta-fine  | 10       |
-| delta-start | 1        |
-| real-inc    | 0.5      |
-| max-inc     | 5        |
-| wait-b      | 0.5      |
-| timeout     | 20       |
-
-No issues on rampup. 
-On rampdown, the PID current was contantly in the order of 3 to 4A.
-
-** Up to 100mT ramp -- 2022/02/08
-
-#+name: parameters-100mT
-#+name: parameters-500mt
-| zero        | 0        |
-| amp         | 100      |
-| N           | 10000     |
-| delta-fine  | 10       |
-| delta-start | 1        |
-| real-inc    | 0.02      |
-| max-inc     | 5        |
-| wait-b      | 0.5      |
-| timeout     | 20       |
-
-No issues! Auxilary current below 1A for the whole time and no timeout!
 
 
