@@ -85,8 +85,8 @@ Parameters
 Hardware
 ----------
 - 2T Bruker Magnet
-- `xantrex XFR 150-8 <https://www.manualslib.com/manual/633965/Xantrex-Xfr-6-200.html#product-XFR%20150-8>`
-- `Stanford Research SR830 Lockin Amplifier <https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf>`
+- `xantrex XFR 150-8 <https://www.manualslib.com/manual/633965/Xantrex-Xfr-6-200.html#product-XFR%20150-8>`_
+- `Stanford Research SR830 Lockin Amplifier <https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf>`_
 - Audio Amplifier with PID-controller
 
 

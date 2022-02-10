@@ -179,7 +179,7 @@ class HallMeasurement:
 
 
     def single_xanterx_set(self, v, d) -> float:
-        """From the lookup tables created in :meth`~HallMeasurement.__generateLookups` a set-value for the xantrex
+        """From the lookup tables created in :meth:`~HallMeasurement.__generateLookups` a set-value for the xantrex
         power supply is calculated based on the direction (up or down) specified.
         
         Args:
