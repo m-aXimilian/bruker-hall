@@ -33,7 +33,7 @@ class HallHandler:
         	b (num): B-field value to reach (mT)
         
         Returns:
-        	Status info of :class`~STATUS`"""
+        	[:class:`~STATUS`]: Status info of"""
         c = abs(b - self.last_b)
         if c > self.measure["settings"]["max-inc"]:
             e = "Field increment with {}mT higher than the allowed {}mT".format(c, self.measure["settings"]["max-inc"])
@@ -80,7 +80,7 @@ class HallHandler:
         	b_next (num): next value
         
         Returns:
-        	A direction of type :class`~DIRECTION`"""
+        	[:class:`~DIRECTION`]: A direction of type """
         
         tmp = DIRECTION.NONE
 

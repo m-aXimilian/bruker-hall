@@ -1,0 +1,167 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>HallHandler module &#8212; Burker Hall Measurements 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HallMeasurement module" href="HallMeasurement.html" />
+    <link rel="prev" title="DaqHallTask module" href="DaqHallTask.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HallMeasurement.html" title="HallMeasurement module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="DaqHallTask.html" title="DaqHallTask module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Burker Hall Measurements 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HallHandler module</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-HallHandler">
+<span id="hallhandler-module"></span><h1>HallHandler module<a class="headerlink" href="#module-HallHandler" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="HallHandler.HallHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">HallHandler.</span></span><span class="sig-name descname"><span class="pre">HallHandler</span></span><a class="headerlink" href="#HallHandler.HallHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="HallHandler.HallHandler.__write_out">
+<span class="sig-name descname"><span class="pre">__write_out</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#HallHandler.HallHandler.__write_out" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="HallHandler.HallHandler.field_diection">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">field_diection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b_current</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b_next</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">src.States.DIRECTION</span></span></span><a class="headerlink" href="#HallHandler.HallHandler.field_diection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates a direction based on a current and a next value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b_current</strong> (<em>num</em>) – current value</p></li>
+<li><p><strong>b_next</strong> (<em>num</em>) – next value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A direction of type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DIRECTION</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="HallHandler.HallHandler.reach_field_fine">
+<span class="sig-name descname"><span class="pre">reach_field_fine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">src.States.STATUS</span></span></span><a class="headerlink" href="#HallHandler.HallHandler.reach_field_fine" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes translated B-field set-values to the xantrex power supply
+and the PID-controller. While the field is not reached and the timeout
+is not exceeded, the function will block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>b</strong> (<em>num</em>) – B-field value to reach (mT)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Status info of</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>[<code class="xref py py-class docutils literal notranslate"><span class="pre">STATUS</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="DaqHallTask.html"
+                        title="previous chapter">DaqHallTask module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="HallMeasurement.html"
+                        title="next chapter">HallMeasurement module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/HallHandler.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="HallMeasurement.html" title="HallMeasurement module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="DaqHallTask.html" title="DaqHallTask module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Burker Hall Measurements 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HallHandler module</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Maximilian Küffner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>

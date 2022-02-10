@@ -1,0 +1,228 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to Bruker Hall and MR Measurements’s documentation! &#8212; Burker Hall Measurements 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="src" href="modules.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="src"
+             accesskey="N">next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Burker Hall Measurements 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to Bruker Hall and MR Measurements’s documentation!</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="welcome-to-bruker-hall-and-mr-measurements-s-documentation">
+<h1>Welcome to Bruker Hall and MR Measurements’s documentation!<a class="headerlink" href="#welcome-to-bruker-hall-and-mr-measurements-s-documentation" title="Permalink to this headline">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>Controlled ramping of a B-field function and measuring
+Lockin-Amplifier parameters. Can be used for <em>Hall-effect</em> and <em>MR</em>
+measurements.</p>
+<section id="h-field-ramp">
+<h3>H-Field Ramp<a class="headerlink" href="#h-field-ramp" title="Permalink to this headline">¶</a></h3>
+<p>The waveform for the ramp is generated automatically by means of the
+parameters (start, stop, increment, etc.) in <a class="reference download internal" download="" href="_downloads/15674b734ec78be17e5a233983bb9ea4/measurement.yaml"><code class="xref download docutils literal notranslate"><span class="pre">measurement</span> <span class="pre">config</span> <span class="pre">file</span></code></a>.
+Based on this wave 2 set-values are generated for
+1. the xantrex power supply and
+2. the PID-controller.
+The first is taken from a fit-function (see the following figure) based
+on B-field measurements for different power supply voltages.</p>
+<blockquote>
+<div><p>The fit-function is generated from the data provided in “B-field-lookup.yaml”. The order of the fit-function can be passed by setting the ~deg~ parameter.
+If not provided, a fit of the first order is calculated.</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="_images/field-set-functions_many-points.png"><img alt="_images/field-set-functions_many-points.png" src="_images/field-set-functions_many-points.png" style="width: 80%;" /></a>
+<p>The PID-controller value is just a scaled value based on the ramp
+wave. See the following figure for an example for a triangular shaped ramp from 0 to 1T</p>
+<a class="reference internal image-reference" href="_images/field-set-voltages_0-1T-ramp_many-points.png"><img alt="_images/field-set-voltages_0-1T-ramp_many-points.png" src="_images/field-set-voltages_0-1T-ramp_many-points.png" style="width: 80%;" /></a>
+</section>
+<section id="bruker-time-constant">
+<h3>Bruker time-constant<a class="headerlink" href="#bruker-time-constant" title="Permalink to this headline">¶</a></h3>
+<p>Needed to prevent runaways of the is value that must be compensated by the PID-controller and result in (too) high currents.
+This happens when the set values are increased too fast for the Bruker magnet to follow (main coil).
+The time-constant describes the time it takes the main coil to reach a new set value. It is calculated in s/mT and can be scaled
+by the respective step size of a measurement. The scaled value should be awaited between subsequent set values.
+A time-constant of <em>0.8s/mT</em> follows from a field-ramp measurement form 0 to 600mT in 2mT steps.</p>
+<blockquote>
+<div><p>The time-constant was calculated by ramping the B-field with the xantrex power supply only. It is assumed that a new set value
+is reached when two subsequent (200ms apart from one another) B-field measurements differ by less than 0.1mT. This time was recorded and taken as a basis for
+the calculation.</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="_images/bruker_time-constant.png"><img alt="_images/bruker_time-constant.png" src="_images/bruker_time-constant.png" style="width: 80%;" /></a>
+</section>
+<section id="measurement">
+<h3>Measurement<a class="headerlink" href="#measurement" title="Permalink to this headline">¶</a></h3>
+<p>The SR8320 sources a sinus voltage, which generates a “constant”
+current by means of a high resistance (kΩ). The input is locked in at
+the source frequency. For every value in of the waveform array</p>
+<ul class="simple">
+<li><p>the respective B-field is set,</p></li>
+<li><p>the process waits until the B-field is within the boundary “delta-start” configured in <a class="reference download internal" download="" href="_downloads/15674b734ec78be17e5a233983bb9ea4/measurement.yaml"><code class="xref download docutils literal notranslate"><span class="pre">measurement</span> <span class="pre">config</span></code></a></p></li>
+<li><p>a number of N measurements is recorded and written to a file</p></li>
+</ul>
+</section>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="n">submodules</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">gitlab</span><span class="o">.</span><span class="n">lrz</span><span class="o">.</span><span class="n">de</span><span class="o">/</span><span class="n">m</span><span class="o">-</span><span class="n">aximilian</span><span class="o">/</span><span class="n">bruker</span><span class="o">-</span><span class="n">hall</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">bruker</span><span class="o">-</span><span class="n">hall</span>
+</pre></div>
+</div>
+</section>
+<section id="notes-and-parameters">
+<h2>Notes and Parameters<a class="headerlink" href="#notes-and-parameters" title="Permalink to this headline">¶</a></h2>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Hall Sensor: 1V := 100mT</p></li>
+<li><p>Xantrex voltage range: 0-150V</p></li>
+</ul>
+</section>
+</section>
+<section id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>2T Bruker Magnet</p></li>
+<li><p><cite>xantrex XFR 150-8 &lt;https://www.manualslib.com/manual/633965/Xantrex-Xfr-6-200.html#product-XFR%20150-8&gt;</cite></p></li>
+<li><p><cite>Stanford Research SR830 Lockin Amplifier &lt;https://www.thinksrs.com/downloads/pdfs/manuals/SR830m.pdf&gt;</cite></p></li>
+<li><p>Audio Amplifier with PID-controller</p></li>
+</ul>
+</section>
+<section id="modules">
+<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">src</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="BrukerTimeConstant.html">BrukerTimeConstant module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="DaqHallTask.html">DaqHallTask module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="HallHandler.html">HallHandler module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="HallMeasurement.html">HallMeasurement module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Lockin.html">Lockin module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="LookupFit.html">LookupFit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="States.html">States module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WaveForm.html">WaveForm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helpers.html">helpers module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Welcome to Bruker Hall and MR Measurements’s documentation!</a><ul>
+<li><a class="reference internal" href="#description">Description</a><ul>
+<li><a class="reference internal" href="#h-field-ramp">H-Field Ramp</a></li>
+<li><a class="reference internal" href="#bruker-time-constant">Bruker time-constant</a></li>
+<li><a class="reference internal" href="#measurement">Measurement</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#notes-and-parameters">Notes and Parameters</a><ul>
+<li><a class="reference internal" href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#hardware">Hardware</a></li>
+<li><a class="reference internal" href="#modules">Modules</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">src</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="src"
+             >next</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">Burker Hall Measurements 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to Bruker Hall and MR Measurements’s documentation!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2022, Maximilian Küffner.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.1.
+    </div>
+  </body>
+</html>

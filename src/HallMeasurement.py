@@ -46,7 +46,7 @@ class HallMeasurement:
         """Write to a DaqHallTask Type task.
 
         Args:
-        	t (:class`~DaqHallTask`): task
+        	t (:class:`~DaqHallTask`): task
 		v (num): value to write"""
         if abs(v) > 10:
             e = "Value %f is beyond the analog channel range." % v
@@ -62,7 +62,7 @@ class HallMeasurement:
         """Read a single value from a given task.
         
         Args:
-        	t (:class`~DaqHallTask`): task to read from"""
+        	t (:class:`~DaqHallTask`): task to read from"""
         logging.debug("Reading from task {}".format(t.task_name))
         return t.singleRead()
 
@@ -88,8 +88,8 @@ class HallMeasurement:
         - one task for EACH analog output
         
         Attention: 
-        	- There must be an AI, that has ``measure'' in the name
-        	- There must be one AO with ``pid'' and one with ``xantrex'' in the name
+        	- There must be an AI, that has *measure* in the name
+        	- There must be one AO with *pid* and one with *xantrex* in the name
         """
         self.tasks = {"reader": DaqHallTask()}
         self.tasks["reader"].add_channels(
@@ -137,10 +137,10 @@ class HallMeasurement:
 
     def __generateLookups(self):
         """From the lookup table specified in the H-field-lookup config, create a lookup 
-        dictionary with V_{up}(H) and V_{down}(H) (:class`~LookupFit.LookupFit`) representing fit-functions for up- and downramps of
+        dictionary with V_{up}(H) and V_{down}(H) (:class:`~LookupFit.LookupFit`) representing fit-functions for up- and downramps of
         the magnetic field. Corresponding power supply voltages for a given filed in mT can be retrieved.
         A simple linear scale is initialized allowing to get back a set-voltage for a given field in mT for the PID controller.
-        (:class`~LookupFit.LinearFit`)."""
+        (:class:`~LookupFit.LinearFit`)."""
         self.xantrex_lookup = {
             "rampup": look.LookupFit(
                 np.array(self.lookup["rampup"][1])/self.lookup["pid-scale"],
@@ -156,7 +156,7 @@ class HallMeasurement:
 
 
     def __generateWave(self):
-        """Generates a waveform from the values specified in the measurement config based on :class`~WaveForm`"""
+        """Generates a waveform from the values specified in the measurement config based on :class:`~WaveForm`"""
         self.wave_handle = wave.WaveForm(
             self.measure["wave"]["amp"], self.measure["wave"]["N"],
             self.measure["wave"]["zero"]
@@ -183,7 +183,7 @@ class HallMeasurement:
         power supply is calculated based on the direction (up or down) specified.
         
         Args:
-        	d (:class`~DIRECTION`): direction of the B-field w.r.t. the previous set-value
+        	d (:class:`~DIRECTION`): direction of the B-field w.r.t. the previous set-value
         	v (num): B-field value to look up
         
         Returns:
@@ -215,7 +215,7 @@ class HallMeasurement:
 
     def __makeSetVXantrex(self):
         """Calculates a set-voltage VECTOR for the xantrex power supply based on the set_field created in 
-        :meth`~HallMeasurement.__generateWave`."""
+        :meth:`~HallMeasurement.__generateWave`."""
         tmp = np.zeros(len(self.set_field))
 
         for i, v in enumerate(self.set_field[:-1]):
@@ -231,7 +231,7 @@ class HallMeasurement:
 
     def __makeSetVPID(self):
         """Calculates a set-voltage VECTOR for the PID-controller based on the set_field created in 
-        :meth`~HallMeasurement.__generateWave`."""
+        :meth:`~HallMeasurement.__generateWave`."""
         self.pid_set = self.pid_lookup.scaler(self.set_field)
 
                 
