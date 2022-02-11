@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('../src'))
 
 MOCK_MODULES = ['numpy', 'matplotlib', 'matplotlib.pyplot', 'nidaqmx', 'pyvisa', 'tqdm', 'scipy',
                 'numpy.core', 'nidaqmx.constants', 'numpy.core.fromnumeric', 'numpy.lib', 'numpy.lib.index_tricks', 'nidaqmx.task', 'yaml', 'pymeasure.instruments.srs','../fmr-py/src/visa_devices',
-                'fmr-py/src/visa_devices', 'visa_devices']
+                '/fmr-py/src/visa_devices', 'visa_devices']
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
