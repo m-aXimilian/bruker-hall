@@ -1,4 +1,4 @@
-import sys, yaml
+import os, sys, yaml
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
@@ -14,12 +14,16 @@ from PyQt5.QtWidgets import (
     QLineEdit
 )
 
+parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(parentdir)
+
+import src.helpers as helper
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.conf = self.load_yaml("qt-config.yaml")
+        self.conf = helper.loadYAMLConfig("../config/measurement.yaml")
         self.setWindowTitle("My App")
         self.setGeometry(100, 100, 600, 400)
 
@@ -31,13 +35,6 @@ class MainWindow(QWidget):
         conf_layout.addTab(self.measurement_conf(), "Measurement")
         conf_layout.addTab(self.data_conf(), "Data")
         outer_layout.addWidget(conf_layout)
-
-    def load_yaml(self, f):
-        with open(f) as _f:
-            return yaml.safe_load(_f)
-
-        yaml.dump
-    
 
 
     def wave_conf(self):
