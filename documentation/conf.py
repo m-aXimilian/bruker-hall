@@ -16,7 +16,7 @@ import mock
 sys.path.insert(0, os.path.abspath('../src'))
 
 MOCK_MODULES = ['numpy', 'matplotlib', 'matplotlib.pyplot', 'nidaqmx', 'pyvisa', 'tqdm', 'scipy',
-'numpy.core', 'nidaqmx.constants', 'numpy.core.fromnumeric', 'numpy.lib', 'numpy.lib.index_tricks', 'nidaqmx.task', 'yaml', 'pymeasure.instruments.srs','visa_devices','src.visa_devices']
+                'numpy.core', 'nidaqmx.constants', 'numpy.core.fromnumeric', 'numpy.lib', 'numpy.lib.index_tricks', 'nidaqmx.task', 'yaml', 'pymeasure.instruments.srs','../fmr-py/src/visa_devices']
 
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
@@ -62,4 +62,4 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+
