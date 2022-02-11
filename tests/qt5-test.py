@@ -23,7 +23,10 @@ import src.helpers as helper
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.conf = helper.loadYAMLConfig("../config/measurement.yaml")
+        if os.name == 'posix':
+            self.conf = helper.loadYAMLConfig("../config/measurement.yaml")
+        else:
+            self.conf = helper.loadYAMLConfig("config/measurement.yaml")
         self.setWindowTitle("My App")
         self.setGeometry(100, 100, 600, 400)
 
