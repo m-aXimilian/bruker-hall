@@ -1,6 +1,7 @@
 import os, sys, yaml
 import numpy as np
 import logging
+import threading
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
@@ -16,7 +17,8 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QLCDNumber,
     QLabel,
-    QFileDialog
+    QFileDialog,
+    QMainWindow
 )
 
 import pyqtgraph as pg
@@ -46,16 +48,28 @@ name_yaml_lookup = {
 yaml_name_lookup = {v: k for k, v in name_yaml_lookup.items()}
 
 # Subclass QMainWindow to customize your application's main window
-class MainWindow(QWidget):
-    def __init__(self):
+
+class MainWindow(QMainWindow):
+
+    def __init__(self, parent=None):
+
+        super(MainWindow, self).__init__(parent)
+        self.form_widget = MainWidget(self)
+        self.setWindowTitle("Bruker Measurement")
+        self.setCentralWidget(self.form_widget)
+        self.showMaximized()
+
+
+class MainWidget(QWidget):
+    def __init__(self,parent):
         super().__init__()
         if os.name == 'posix':
             self.default_conf = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.default_conf = helper.loadYAMLConfig("config/measurement.yaml")
-        self.setWindowTitle("Bruker Measurement")
         # self.setGeometry(100, 100, 1000, 600)
-        self.showMaximized()
+        self.parent = parent
+        self.parent.statusBar().showMessage("init.")
 
         self.conf = {}
 
@@ -65,6 +79,7 @@ class MainWindow(QWidget):
         conf_button_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
         plot_layout = pg.PlotWidget()
+        
 
         self.setLayout(outer_layout)
 
@@ -89,7 +104,6 @@ class MainWindow(QWidget):
         outer_layout.addWidget(plot_layout,3)
 
 
-
     def generate_config_dict(self):     
         self.conf = {"wave": self.__dict_convert(self.wave),
                      "settings": self.__dict_convert(self.meas),
@@ -100,7 +114,6 @@ class MainWindow(QWidget):
     def override_default_dict(self, file_name):
         self.default_conf = helper.loadYAMLConfig(file_name)
         
-
 
     def __dict_convert(self, orig):
         res = {}
@@ -158,6 +171,8 @@ class MainWindow(QWidget):
         else:
             tmp_p += "conf/test.yaml"
 
+        self.status_bar_info("wrote config to: %s" % os.path.abspath(tmp_p))
+
         os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
         with open(tmp_p, 'w') as out:
             yaml.dump(self.conf, out)
@@ -166,8 +181,12 @@ class MainWindow(QWidget):
     def load_conf_button_handler(self):
         f = QFileDialog.getOpenFileName(self, "Select Configuration File", filter="Configuration Files (*.yaml *.yml)")
         
+        logging.debug("config file from %s" % f[0])
+        self.status_bar_info("load config from: %s" %f[0])
+        
         self.override_default_dict(f[0])
         self.make_config_tabs(self.conf_layout)
+        
         
         
         
@@ -229,12 +248,20 @@ class MainWindow(QWidget):
             
         tab.setLayout(t_l)
         return tab
+
+    def status_bar_info(self, msg):
+        self.parent.statusBar().setStyleSheet("color: black")
+        self.parent.statusBar().showMessage(msg)
+
+    def status_bar_error(self, msg):
+        self.parent.statusBar().setStyleSheet("color: red")
+        self.parent.statusBar().showMessage(msg)
         
-
-
+        
 
 def main():
     app = QApplication(sys.argv)
+    app.setApplicationName("Bruker MR")
 
     window = MainWindow()
 
