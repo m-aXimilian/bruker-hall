@@ -31,16 +31,16 @@ import src.helpers as helper
 test_data = np.genfromtxt("./results/2022-02-09_15-50-08bruker-time-constant_to599mT.csv", delimiter=",",skip_header=1, names=True)
 
 name_yaml_lookup = {
-    "delta-fine": "delta-fine",
-    "delta-start": "delta-start",
-    "max-inc": "max-inc",
-    "wait-b": "wait-b",
-    "timeout": "timeout",
-    "bruker-const": "bruker-const",
-    "Form": "form",
-    "Zero": "zero",
-    "Amplitude": "amp",
-    "N": "N",
+    "delta-fine (mT)": "delta-fine",
+    "delta-start (mT)": "delta-start",
+    "max-inc (mT)": "max-inc",
+    "wait-b (s)": "wait-b",
+    "timeout (s)": "timeout",
+    "bruker-const (s/mT)": "bruker-const",
+    "Form (n.v.)": "form",
+    "Zero (p.u.)": "zero",
+    "Amplitude (mT)": "amp",
+    "N (n.v.)": "N",
     "Sample": "sample",
     "Path": "path",
 }
