@@ -26,6 +26,23 @@ import src.helpers as helper
 
 test_data = np.genfromtxt("./results/2022-02-09_15-50-08bruker-time-constant_to599mT.csv", delimiter=",",skip_header=1, names=True)
 
+name_yaml_lookup = {
+    "delta-fine": "delta-fine",
+    "delta-start": "delta-start",
+    "max-inc": "max-inc",
+    "wait-b": "wait-b",
+    "timeout": "timeout",
+    "bruker-const": "bruker-const",
+    "Form": "form",
+    "Zero": "zero",
+    "Amplitude": "amp",
+    "N": "N",
+    "Sample": "sample",
+    "Path": "path",
+}
+
+yaml_name_lookup = {v: k for k, v in name_yaml_lookup.items()}
+
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QWidget):
     def __init__(self):
@@ -69,6 +86,24 @@ class MainWindow(QWidget):
         outer_layout.addWidget(plot_layout,3)
 
 
+
+    def generate_config_dict(self):     
+        self.conf = {"wave": self.__dict_convert(self.wave),
+                     "settings": self.__dict_convert(self.meas),
+                     "data": self.__dict_convert(self.data)
+                     }
+
+
+    def __dict_convert(self, orig):
+        res = {}
+        for k, v in orig.items():
+            if isinstance(v, QLineEdit):
+                res[name_yaml_lookup[k]] =  v.text()
+            if isinstance(v, (QSpinBox, QDoubleSpinBox)):
+                res[name_yaml_lookup[k]] =  v.value()
+        return res
+
+
     def LCD(self, layout):
         tmp = QLCDNumber()
         layout.addWidget(tmp)
@@ -97,33 +132,49 @@ class MainWindow(QWidget):
 
 
     def make_config_buttons(self, button_layout):
-        save_conf_button = QPushButton("Save Configuration")
-        load_conf_button = QPushButton("Load Configuration")
+        self.save_conf_button = QPushButton("Save Configuration")
+        self.load_conf_button = QPushButton("Load Configuration")
 
-        button_layout.addWidget(save_conf_button)
-        button_layout.addWidget(load_conf_button)
+        self.save_conf_button.clicked.connect(self.save_conf_button_handler)
+
+        button_layout.addWidget(self.save_conf_button)
+        button_layout.addWidget(self.load_conf_button)
 
 
+    def save_conf_button_handler(self):
+        self.generate_config_dict()
+        tmp_p = self.conf["data"]["path"]
+        if tmp_p == "":
+            tmp_p = "./tmp_conf/test.yaml"
+        
+        print(self.conf)
 
+        os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
+        with open(tmp_p, 'w') as out:
+            yaml.dump(self.conf, out)
+
+        
+        
     def wave_conf(self):
         tab = QWidget()
         t_l = QFormLayout()
         w = self.default_conf["wave"]
 
         self.wave = {
-            "Form": QLineEdit(),
-            "Zero": QDoubleSpinBox(),
-            "Amplitude": QSpinBox(),
-            "N": QSpinBox()
+            yaml_name_lookup["form"]: QLineEdit(),
+            yaml_name_lookup["zero"]: QDoubleSpinBox(),
+            yaml_name_lookup["amp"]: QSpinBox(),
+            yaml_name_lookup["N"]: QSpinBox()
         }
-        self.wave["Form"].setText(w["form"])
-        self.wave["Zero"].setValue(w["zero"])
-        self.wave["Zero"].setRange(0.0,1.0)
-        self.wave["Zero"].setSingleStep(0.1)
-        self.wave["Amplitude"].setRange(-10,1200)
-        self.wave["Amplitude"].setValue(w["amp"]),
-        self.wave["N"].setRange(10,100000)
-        self.wave["N"].setValue(w["N"])
+        
+        self.wave[yaml_name_lookup["form"]].setText(w["form"])
+        self.wave[yaml_name_lookup["zero"]].setValue(w["zero"])
+        self.wave[yaml_name_lookup["zero"]].setRange(0.0,1.0)
+        self.wave[yaml_name_lookup["zero"]].setSingleStep(0.1)
+        self.wave[yaml_name_lookup["amp"]].setRange(-10,1200)
+        self.wave[yaml_name_lookup["amp"]].setValue(w["amp"]),
+        self.wave[yaml_name_lookup["N"]].setRange(10,100000)
+        self.wave[yaml_name_lookup["N"]].setValue(w["N"])
 
 
         for k, v in self.wave.items():
@@ -140,7 +191,7 @@ class MainWindow(QWidget):
         for k, v in self.default_conf["settings"].items():
             self.meas[k] = QDoubleSpinBox()
             self.meas[k].setValue(v)
-            t_l.addRow(k, self.meas[k])
+            t_l.addRow(yaml_name_lookup[k], self.meas[k])
 
 
         tab.setLayout(t_l)
@@ -149,7 +200,7 @@ class MainWindow(QWidget):
     def data_conf(self):
         tab = QWidget()
         t_l = QFormLayout()
-        self.data = {"Sample": QLineEdit(), "Path": QLineEdit()}
+        self.data = {yaml_name_lookup["sample"]: QLineEdit(), yaml_name_lookup["path"]: QLineEdit()}
         
         for k, v in self.data.items():
             t_l.addRow(k, v)
