@@ -14,7 +14,8 @@ from PyQt5.QtWidgets import (
     QDoubleSpinBox,
     QLineEdit,
     QLCDNumber,
-    QLabel
+    QLabel,
+    QFileDialog
 )
 
 import pyqtgraph as pg
@@ -136,7 +137,7 @@ class MainWindow(QWidget):
         self.load_conf_button = QPushButton("Load Configuration")
 
         self.save_conf_button.clicked.connect(self.save_conf_button_handler)
-
+        self.load_conf_button.clicked.connect(self.load_conf_button_handler)
         button_layout.addWidget(self.save_conf_button)
         button_layout.addWidget(self.load_conf_button)
 
@@ -146,13 +147,18 @@ class MainWindow(QWidget):
         tmp_p = self.conf["data"]["path"]
         if tmp_p == "":
             tmp_p = "./tmp_conf/test.yaml"
-        
-        print(self.conf)
+        else:
+            tmp_p += "conf/test.yaml"
 
         os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
         with open(tmp_p, 'w') as out:
             yaml.dump(self.conf, out)
 
+
+    def load_conf_button_handler(self):
+        f = str(QFileDialog.getOpenFileName(self, "Select Directory"))
+        print(f)
+        
         
         
     def wave_conf(self):
