@@ -1,5 +1,6 @@
 import os, sys, yaml
 import numpy as np
+import logging
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtWidgets import (
@@ -53,7 +54,8 @@ class MainWindow(QWidget):
         else:
             self.default_conf = helper.loadYAMLConfig("config/measurement.yaml")
         self.setWindowTitle("Bruker Measurement")
-        self.setGeometry(100, 100, 900, 400)
+        # self.setGeometry(100, 100, 1000, 600)
+        self.showMaximized()
 
         self.conf = {}
 
@@ -69,9 +71,9 @@ class MainWindow(QWidget):
         self.configure_plot(plot_layout)
         self.plot_data(plot_layout)
 
-        conf_layout = QTabWidget()
+        self.conf_layout = QTabWidget()
         
-        self.make_config_tabs(conf_layout)
+        self.make_config_tabs(self.conf_layout)
         self.make_config_buttons(conf_button_layout)
 
         status_layout.addStretch(2)
@@ -79,7 +81,7 @@ class MainWindow(QWidget):
         self.LCD(status_layout)
 
         left_col.addLayout(conf_button_layout)
-        left_col.addWidget(conf_layout)
+        left_col.addWidget(self.conf_layout)
         left_col.addLayout(status_layout)
 
         self.make_start_button(left_col)        
@@ -93,6 +95,11 @@ class MainWindow(QWidget):
                      "settings": self.__dict_convert(self.meas),
                      "data": self.__dict_convert(self.data)
                      }
+
+
+    def override_default_dict(self, file_name):
+        self.default_conf = helper.loadYAMLConfig(file_name)
+        
 
 
     def __dict_convert(self, orig):
@@ -127,6 +134,7 @@ class MainWindow(QWidget):
         
 
     def make_config_tabs(self, conf_widget):
+        conf_widget.clear()
         conf_widget.addTab(self.measurement_conf(), "Measurement")
         conf_widget.addTab(self.wave_conf(), "Wave")
         conf_widget.addTab(self.data_conf(), "Data")
@@ -156,8 +164,10 @@ class MainWindow(QWidget):
 
 
     def load_conf_button_handler(self):
-        f = str(QFileDialog.getOpenFileName(self, "Select Directory"))
-        print(f)
+        f = QFileDialog.getOpenFileName(self, "Select Configuration File", filter="Configuration Files (*.yaml *.yml)")
+        
+        self.override_default_dict(f[0])
+        self.make_config_tabs(self.conf_layout)
         
         
         
@@ -208,8 +218,14 @@ class MainWindow(QWidget):
         t_l = QFormLayout()
         self.data = {yaml_name_lookup["sample"]: QLineEdit(), yaml_name_lookup["path"]: QLineEdit()}
         
+        if "data" in self.default_conf:
+            self.data[yaml_name_lookup["sample"]].setText(self.default_conf["data"]["sample"])
+            self.data[yaml_name_lookup["path"]].setText(self.default_conf["data"]["path"])
+
+
         for k, v in self.data.items():
             t_l.addRow(k, v)
+            
             
         tab.setLayout(t_l)
         return tab
@@ -227,4 +243,5 @@ def main():
     app.exec()
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='../log/gui.log', filemode='w', level=logging.DEBUG)
     main()
