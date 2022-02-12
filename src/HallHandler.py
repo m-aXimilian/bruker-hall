@@ -2,6 +2,7 @@ from locale import currency
 import os, sys
 import logging
 import time
+import uuid
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -22,6 +23,7 @@ class HallHandler:
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement()
         self.last_b = 0
+        self.uuid = str(uuid.uuid4())
 
 
     def reach_field_fine(self, b) -> STATUS:
