@@ -119,9 +119,9 @@ class MainWidget(QWidget):
         res = {}
         for k, v in orig.items():
             if isinstance(v, QLineEdit):
-                res[name_yaml_lookup[k]] =  v.text()
+                res[k] =  v.text()
             if isinstance(v, (QSpinBox, QDoubleSpinBox)):
-                res[name_yaml_lookup[k]] =  v.value()
+                res[k] =  v.value()
         return res
 
 
@@ -172,23 +172,30 @@ class MainWidget(QWidget):
             tmp_p += "conf/test.yaml"
 
         self.status_bar_info("wrote config to: %s" % os.path.abspath(tmp_p))
+        self.disable_button(self.save_conf_button)
 
         os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
         with open(tmp_p, 'w') as out:
             yaml.dump(self.conf, out)
-
+            
 
     def load_conf_button_handler(self):
         f = QFileDialog.getOpenFileName(self, "Select Configuration File", filter="Configuration Files (*.yaml *.yml)")
         
         logging.debug("config file from %s" % f[0])
         self.status_bar_info("load config from: %s" %f[0])
-        
+
         self.override_default_dict(f[0])
         self.make_config_tabs(self.conf_layout)
         
-        
-        
+
+    def disable_button(self, button):
+        button.setEnabled(False)
+
+
+    def enable_button(self, button):
+        button.setEnabled(True)
+    
         
     def wave_conf(self):
         tab = QWidget()
@@ -235,7 +242,7 @@ class MainWidget(QWidget):
     def data_conf(self):
         tab = QWidget()
         t_l = QFormLayout()
-        self.data = {yaml_name_lookup["sample"]: QLineEdit(), yaml_name_lookup["path"]: QLineEdit()}
+        self.data = {"sample": QLineEdit(), "path": QLineEdit()}
         
         if "data" in self.default_conf:
             self.data[yaml_name_lookup["sample"]].setText(self.default_conf["data"]["sample"])
