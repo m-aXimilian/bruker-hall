@@ -203,24 +203,29 @@ class MainWidget(QWidget):
         w = self.default_conf["wave"]
 
         self.wave = {
-            yaml_name_lookup["form"]: QLineEdit(),
-            yaml_name_lookup["zero"]: QDoubleSpinBox(),
-            yaml_name_lookup["amp"]: QSpinBox(),
-            yaml_name_lookup["N"]: QSpinBox()
+            "form": QLineEdit(),
+            "zero": QDoubleSpinBox(),
+            "amp": QSpinBox(),
+            "N": QSpinBox()
         }
         
-        self.wave[yaml_name_lookup["form"]].setText(w["form"])
-        self.wave[yaml_name_lookup["zero"]].setValue(w["zero"])
-        self.wave[yaml_name_lookup["zero"]].setRange(0.0,1.0)
-        self.wave[yaml_name_lookup["zero"]].setSingleStep(0.1)
-        self.wave[yaml_name_lookup["amp"]].setRange(-10,1200)
-        self.wave[yaml_name_lookup["amp"]].setValue(w["amp"]),
-        self.wave[yaml_name_lookup["N"]].setRange(10,100000)
-        self.wave[yaml_name_lookup["N"]].setValue(w["N"])
-
+        self.wave["form"].setText(w["form"])
+        self.wave["zero"].setValue(w["zero"])
+        self.wave["zero"].setRange(0.0,1.0)
+        self.wave["zero"].setSingleStep(0.1)
+        self.wave["amp"].setRange(-10,1200)
+        self.wave["amp"].setValue(w["amp"]),
+        self.wave["N"].setRange(10,100000)
+        self.wave["N"].setValue(w["N"])
 
         for k, v in self.wave.items():
-            t_l.addRow(k, v)
+            t_l.addRow(yaml_name_lookup[k], v)
+
+            if isinstance(v, QLineEdit):
+                v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+            if isinstance(v, (QSpinBox, QDoubleSpinBox)):
+                v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+
             
         tab.setLayout(t_l)
         return tab
@@ -234,6 +239,13 @@ class MainWidget(QWidget):
             self.meas[k] = QDoubleSpinBox()
             self.meas[k].setValue(v)
             t_l.addRow(yaml_name_lookup[k], self.meas[k])
+
+        for v in self.meas.values():
+            if isinstance(v, QLineEdit):
+                v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+            if isinstance(v, (QSpinBox, QDoubleSpinBox)):
+                v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+
 
 
         tab.setLayout(t_l)
@@ -251,6 +263,12 @@ class MainWidget(QWidget):
 
         for k, v in self.data.items():
             t_l.addRow(k, v)
+
+        for v in self.data.values():
+            if isinstance(v, QLineEdit):
+                v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+            if isinstance(v, (QSpinBox, QDoubleSpinBox)):
+                v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
             
             
         tab.setLayout(t_l)
