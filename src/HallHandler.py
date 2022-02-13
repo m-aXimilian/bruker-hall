@@ -23,7 +23,12 @@ class HallHandler:
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement()
         self.last_b = 0
-        self.uuid = str(uuid.uuid4())
+        self.update_id()
+
+
+
+    def update_id(self):
+        self.uuid = uuid.uuid1()
 
 
     def reach_field_fine(self, b) -> STATUS:
