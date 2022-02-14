@@ -132,9 +132,7 @@ class MainWidget(QWidget):
             
     @staticmethod
     def meas_thread(n):
-        for v in n.m_handler.m_hall.set_field:
-            n.m_handler.reach_field_fine(v)
-            print("reaching {:10.3f} mT".format(v), end="\r")
+        n.m_handler.measure_with_wave()
         n.enable_button(n.start_button)
         n.status_bar_info("done.")
         
@@ -216,10 +214,11 @@ class MainWidget(QWidget):
     def save_conf_button_handler(self):
         self.generate_config_dict()
         tmp_p = self.conf["data"]["path"]
+        tmp_id = str(self.m_handler.uuid)
         if tmp_p == "":
-            tmp_p = "./tmp_conf/test.yaml"
+            tmp_p = "./tmp_conf/config_{}.yaml".format(tmp_id)
         else:
-            tmp_p += "conf/test.yaml"
+            tmp_p += "{}/config_{}.yaml".format(tmp_id, tmp_id)
 
         self.status_bar_info("wrote config to: %s" % os.path.abspath(tmp_p))
         self.disable_button(self.save_conf_button)

@@ -43,6 +43,12 @@ class HallHandler:
     def update_id(self):
         self.uuid = uuid.uuid1()
 
+           
+    def measure_with_wave(self):
+        for v in self.m_hall.set_field:
+            self.reach_field_fine(v)
+            print("reaching {:10.3f} mT".format(v), end="\r")
+    
 
     def reach_field_fine(self, b) -> STATUS:
         """Writes translated B-field set-values to the xantrex power supply 
