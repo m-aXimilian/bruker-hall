@@ -1,3 +1,5 @@
+from concurrent.futures import thread
+from faulthandler import disable
 import os, sys, yaml
 import numpy as np
 import logging
@@ -75,6 +77,9 @@ class MainWidget(QWidget):
 
         self.conf = {}
 
+        # connect a HallHandler
+        self.connect_devices()
+
         outer_layout = QHBoxLayout()
         left_col = QVBoxLayout()
         left_col.setSpacing(10)
@@ -82,56 +87,81 @@ class MainWidget(QWidget):
         status_layout = QHBoxLayout()
         plot_layout = pg.PlotWidget()
         
-
+        # outmost layout
         self.setLayout(outer_layout)
 
+        # add plot layout
         self.configure_plot(plot_layout)
         self.plot_data(plot_layout)
 
+        # add configuration layout
         self.conf_layout = QTabWidget()
-        
         self.make_config_tabs(self.conf_layout)
         self.make_config_buttons(conf_button_layout)
 
+        # add status layout
         status_layout.addStretch(2)
-        status_layout.addWidget(QLabel("Current B-Field (mT)"))
+        self.show_field_button = QPushButton("Current B-Field (mT)")
+        self.show_field_button.clicked.connect(self.show_b)
+        status_layout.addWidget(self.show_field_button)
         self.LCD(status_layout)
 
+        # glue the left layout (conf and status)
         left_col.addLayout(conf_button_layout)
         left_col.addWidget(self.conf_layout)
         left_col.addLayout(status_layout)
+        self.make_start_button(left_col) 
 
-        self.make_start_button(left_col)        
+        # set to the outer layout       
         outer_layout.addLayout(left_col,1)
         outer_layout.addWidget(plot_layout,3)
-
-        self.connect_devices()
-        self.show_last_b()
 
 
     def connect_devices(self):
         self.m_handler = hall.HallHandler()
-        
+
     
-    def show_last_b(self):
-        set_b = lambda: self.b_lcd.display(self.m_handler.m_hall.read_field())
-        self.last_b_timer = QTimer()
-        self.last_b_timer.setInterval(500)
-        self.last_b_timer.timeout.connect(set_b)
-        self.last_b_timer.start()
+    def do_measure(self):
+        self.show_connect_b()
+        self.status_bar_info("Running measurement...")
+        self.disable_button(self.start_button)
+        m_th = threading.Thread(target=self.meas_thread, args=(self,))
+        m_th.start()
+
+
+            
+    @staticmethod
+    def meas_thread(n):
+        for v in n.m_handler.m_hall.set_field:
+            n.m_handler.reach_field_fine(v)
+            print("reaching {:10.3f} mT".format(v), end="\r")
+        n.enable_button(n.start_button)
+        n.status_bar_info("done.")
         
+
+    def show_connect_b(self):
+        set_b = lambda: self.b_lcd.display(self.m_handler.current_field)
+        self.m_handler.signaller.new_b_field.connect(set_b)
+
+    
+    def show_b(self):
+        tmp = self.m_handler.m_hall.read_field()
+        self.b_lcd.display(tmp)
+
 
     def generate_config_dict(self):     
         self.conf = {"wave": self.__dict_convert(self.wave),
                      "settings": self.__dict_convert(self.meas),
                      "data": self.__dict_convert(self.data)
                      }
+        self.m_handler = hall.HallHandler(self.conf)
 
 
     def override_default_dict(self, file_name):
         self.default_conf = helper.loadYAMLConfig(file_name)
+        self.m_handler = hall.HallHandler(self.default_conf)
         
-
+     
     def __dict_convert(self, orig):
         res = {}
         for k, v in orig.items():
@@ -160,10 +190,11 @@ class MainWidget(QWidget):
 
 
     def make_start_button(self, start_widget):
-        start_button = QPushButton("Start Measurement")
-        start_button.setStyleSheet("font: bold 20px")
-        start_widget.addWidget(start_button)
-        
+        self.start_button = QPushButton("Start Measurement")
+        self.start_button.setStyleSheet("font: bold 20px")
+        self.start_button.clicked.connect(self.do_measure)
+        start_widget.addWidget(self.start_button)
+            
 
     def make_config_tabs(self, conf_widget):
         conf_widget.clear()
@@ -276,8 +307,8 @@ class MainWidget(QWidget):
         self.data = {"sample": QLineEdit(), "path": QLineEdit()}
         
         if "data" in self.default_conf:
-            self.data[yaml_name_lookup["sample"]].setText(self.default_conf["data"]["sample"])
-            self.data[yaml_name_lookup["path"]].setText(self.default_conf["data"]["path"])
+            self.data["sample"].setText(self.default_conf["data"]["sample"])
+            self.data["path"].setText(self.default_conf["data"]["path"])
 
 
         for k, v in self.data.items():

@@ -2,6 +2,8 @@ from locale import currency
 import os, sys
 import logging
 import time
+from PyQt5.QtCore import pyqtSignal, QObject
+
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -11,17 +13,24 @@ from src.HallMeasurement import HallMeasurement
 import src.helpers as helper
 from src.States import STATUS, DIRECTION
 
+class UiSignals(QObject):
+    new_b_field = pyqtSignal()
+
 
 class HallHandler:
-    def __init__(self):
+    def __init__(self, config_file = ""):
         if os.name == 'posix':
             self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
+
+        if config_file:
+            self.measure = config_file
         
         self.steps = self.measure["wave"]["N"]
-        self.m_hall = HallMeasurement()
+        self.m_hall = HallMeasurement(self.measure)
         self.last_b = 0
+        self.signaller = UiSignals()
 
 
     def reach_field_fine(self, b) -> STATUS:
@@ -46,6 +55,9 @@ class HallHandler:
 
         self.current_field = self.m_hall.read_field()
         delta_tmp = abs(b - self.current_field)
+
+        # UI: signal new b_field
+        self.signaller.new_b_field.emit()
 
         xan_set = self.m_hall.single_xanterx_set(b, direction)
         pid_set = self.m_hall.single_pid_set(b)
