@@ -2,7 +2,10 @@ from locale import currency
 import os, sys
 import logging
 import time
+
+import uuid
 from concurrent import futures
+
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -19,6 +22,12 @@ class HallHandler:
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement()
         self.last_b = 0
+        self.update_id()
+
+
+
+    def update_id(self):
+        self.uuid = uuid.uuid1()
 
 
     def __load_config(self, f):
