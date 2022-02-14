@@ -17,8 +17,9 @@ class Lockin(SR830):
     def __setup(self):
         """Sets a frequency configured in a measurement config-file and does a quick_range to ensure, 
         the amplifier is not in overload."""
-        self.quick_range()
+        #self.quick_range()
         self.frequency = self.params["f"]
+
         
 
 
