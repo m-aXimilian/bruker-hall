@@ -2,8 +2,9 @@ import os, sys, yaml
 import numpy as np
 import logging
 import threading
+import time
 
-from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtCore import *
 from PyQt5.QtWidgets import (
     QApplication,
     QPushButton,
@@ -18,7 +19,7 @@ from PyQt5.QtWidgets import (
     QLCDNumber,
     QLabel,
     QFileDialog,
-    QMainWindow
+    QMainWindow,
 )
 
 import pyqtgraph as pg
@@ -27,8 +28,9 @@ parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
 
 import src.helpers as helper
+import src.HallHandler as hall
 
-test_data = np.genfromtxt("./results/2022-02-09_15-50-08bruker-time-constant_to599mT.csv", delimiter=",",skip_header=1, names=True)
+test_data = np.genfromtxt("tests/results/2022-02-09_15-50-08bruker-time-constant_to599mT.csv", delimiter=",",skip_header=1, names=True)
 
 name_yaml_lookup = {
     "delta-fine (mT)": "delta-fine",
@@ -103,6 +105,21 @@ class MainWidget(QWidget):
         outer_layout.addLayout(left_col,1)
         outer_layout.addWidget(plot_layout,3)
 
+        self.connect_devices()
+        self.show_last_b()
+
+
+    def connect_devices(self):
+        self.m_handler = hall.HallHandler()
+        
+    
+    def show_last_b(self):
+        set_b = lambda: self.b_lcd.display(self.m_handler.m_hall.read_field())
+        self.last_b_timer = QTimer()
+        self.last_b_timer.setInterval(500)
+        self.last_b_timer.timeout.connect(set_b)
+        self.last_b_timer.start()
+        
 
     def generate_config_dict(self):     
         self.conf = {"wave": self.__dict_convert(self.wave),
@@ -126,9 +143,11 @@ class MainWidget(QWidget):
 
 
     def LCD(self, layout):
-        tmp = QLCDNumber()
-        layout.addWidget(tmp)
-        return tmp
+        self.b_lcd = QLCDNumber()
+        self.b_lcd.setNumDigits(6)
+        self.b_lcd.setStyleSheet("background-color: red")
+        layout.addWidget(self.b_lcd)
+        return self.b_lcd
 
 
     def configure_plot(self, plt_widget):
@@ -295,5 +314,5 @@ def main():
     app.exec()
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='../log/gui.log', filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename='log/gui.log', filemode='w', level=logging.DEBUG)
     main()
