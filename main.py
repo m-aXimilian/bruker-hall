@@ -1,6 +1,7 @@
 from ast import arg
 import src.HallMeasurement as hall
 import src.helpers as helper
+from src.main_ui import *
 from enum import IntFlag
 
 import threading
@@ -12,7 +13,7 @@ def thrd_f(res, i):
     time.sleep(1)
     res[i] = time.time_ns()
 
-def main():
+def test():
 
     res = [None]*2
     with futures.ThreadPoolExecutor(max_workers=2) as e:
@@ -38,5 +39,17 @@ def main():
 
     print(scnd-frst)
 
+def main():
+    app = QApplication(sys.argv)
+    app.setApplicationName("Bruker MR")
+
+    window = MainWindow()
+
+    window.show()
+
+    app.exec()
+
 if __name__ == "__main__":
+    logging.basicConfig(filename='log/gui.log', filemode='w', level=logging.DEBUG)
     main()
+
