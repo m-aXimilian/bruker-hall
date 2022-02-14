@@ -47,7 +47,8 @@ class HallHandler:
     def measure_with_wave(self):
         for v in self.m_hall.set_field:
             self.reach_field_fine(v)
-            print("reaching {:10.3f} mT".format(v), end="\r")
+            # print("reaching {:10.3f} mT".format(v), end="\r")
+            print(self.read_concurrently(), end="\n")
     
 
     def reach_field_fine(self, b) -> STATUS:
@@ -129,7 +130,7 @@ class HallHandler:
             e.submit(HallHandler.async_field_handle, res_f, self.m_hall)
             e.submit(HallHandler.async_xy_handle, res_xy, self.m_hall)
 
-        return res_xy[0]-res_f[0]
+        return [res_f, res_xy]
 
     @staticmethod
     def async_field_handle(r, hall):

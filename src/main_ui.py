@@ -125,6 +125,8 @@ class MainWidget(QWidget):
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
         self.disable_button(self.start_button)
+        self.disable_button(self.load_conf_button)
+        self.disable_button(self.save_conf_button)
         m_th = threading.Thread(target=self.meas_thread, args=(self,))
         m_th.start()
 
@@ -134,6 +136,8 @@ class MainWidget(QWidget):
     def meas_thread(n):
         n.m_handler.measure_with_wave()
         n.enable_button(n.start_button)
+        n.enable_button(n.load_conf_button)
+        n.enable_button(n.save_conf_button)
         n.status_bar_info("done.")
         
 
