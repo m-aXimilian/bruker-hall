@@ -22,7 +22,7 @@ from src.States import STATUS, DIRECTION
 
 class HallMeasurement:
     """Container for Bruker Measurement."""
-    def __init__(self):
+    def __init__(self, config_file = ""):
         if os.name == 'posix':
             self.params = helper.loadYAMLConfig("../config/devices.yaml")
             self.lookup = helper.loadYAMLConfig("../config/B-field-lookup.yaml")
@@ -31,6 +31,9 @@ class HallMeasurement:
             self.params = helper.loadYAMLConfig("config/devices.yaml")
             self.lookup = helper.loadYAMLConfig("config/B-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
+        
+        if config_file:
+            self.measure = config_file
 
         self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
 
