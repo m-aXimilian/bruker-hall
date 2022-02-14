@@ -2,7 +2,10 @@ from locale import currency
 import os, sys
 import logging
 import time
+
 import uuid
+from concurrent import futures
+
 
 parentdir = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(parentdir)
@@ -14,12 +17,8 @@ from src.States import STATUS, DIRECTION
 
 
 class HallHandler:
-    def __init__(self):
-        if os.name == 'posix':
-            self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
-        else:
-            self.measure = helper.loadYAMLConfig("config/measurement.yaml")
-        
+    def __init__(self, f = "config/measurement.yaml"):
+        self.__load_config(f)
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement()
         self.last_b = 0
@@ -29,6 +28,13 @@ class HallHandler:
 
     def update_id(self):
         self.uuid = uuid.uuid1()
+
+
+    def __load_config(self, f):
+        l = f
+        if os.name == 'posix':
+            l += "../"
+        self.measure = helper.loadYAMLConfig(l)
 
 
     def reach_field_fine(self, b) -> STATUS:
@@ -100,7 +106,25 @@ class HallHandler:
 
         return tmp
 
+    def read_concurrently(self):
+        res_f = [None]*2
+        res_xy = [None]*3
+        with futures.ThreadPoolExecutor(max_workers=2) as e:
+            e.submit(HallHandler.async_field_handle, res_f, self.m_hall)
+            e.submit(HallHandler.async_xy_handle, res_xy, self.m_hall)
 
-    def __write_out(self):
-        pass
-    
+        return res_xy[0]-res_f[0]
+
+    @staticmethod
+    def async_field_handle(r, hall):
+        time.sleep(0.005) # xy read from gpib is slower than daq-read
+        tmp = hall.read_field()
+        r[0] = time.time()
+        r[1] = tmp
+
+    @staticmethod
+    def async_xy_handle(r, hall):
+        tmp = hall.lockin.xy
+        r[0] = time.time()
+        r[1] = tmp[0]
+        r[2] = tmp[1]

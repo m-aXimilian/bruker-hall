@@ -32,7 +32,7 @@ class HallMeasurement:
             self.lookup = helper.loadYAMLConfig("config/B-field-lookup.yaml")
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
-        #self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
+        self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
 
         self.__generateLookups()
         self.__generateWave()
