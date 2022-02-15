@@ -85,14 +85,16 @@ class MainWidget(QWidget):
         left_col.setSpacing(10)
         conf_button_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
-        plot_layout = pg.PlotWidget()
+        self.plot_layout = pg.PlotWidget()
         
         # outmost layout
         self.setLayout(outer_layout)
 
         # add plot layout
-        self.configure_plot(plot_layout)
-        self.plot_data(plot_layout)
+        self.configure_plot(self.plot_layout)
+        # self.plot_data(self.plot_layout, test_data)
+        
+
 
         # add configuration layout
         self.conf_layout = QTabWidget()
@@ -114,7 +116,7 @@ class MainWidget(QWidget):
 
         # set to the outer layout       
         outer_layout.addLayout(left_col,1)
-        outer_layout.addWidget(plot_layout,3)
+        outer_layout.addWidget(self.plot_layout,3)
 
 
     def connect_devices(self):
@@ -122,6 +124,8 @@ class MainWidget(QWidget):
 
     
     def do_measure(self):
+        self.m_handler.signaller.new_data_available.connect(self.live_plot)
+        self.plot_layout.clear()
         self.m_handler.already_measured = True
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
@@ -140,7 +144,7 @@ class MainWidget(QWidget):
         n.enable_button(n.load_conf_button)
         n.enable_button(n.save_conf_button)
         n.status_bar_info("done. \t results saved to: %s" %os.path.abspath(n.m_handler.filename))
-        
+     
 
     def show_connect_b(self):
         set_b = lambda: self.b_lcd.display(self.m_handler.current_field)
@@ -186,9 +190,14 @@ class MainWidget(QWidget):
         plt_widget.setBackground('w')
 
 
-    def plot_data(self, plt_widget):
+    def live_plot(self):
+        data = np.genfromtxt(self.m_handler.filename, skip_header=2, delimiter=',')
+        self.plot_data(self.plot_layout, data)
+        
+
+    def plot_data(self, plt_widget, data):
         pen = pg.mkPen(color=(0,105,80))
-        plt_widget.plot(test_data["setval"], test_data["reachedat"], pen=pen)
+        plt_widget.plot(data[:,0], data[:,1], pen=pen)
 
 
     def make_start_button(self, start_widget):

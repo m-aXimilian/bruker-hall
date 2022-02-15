@@ -57,10 +57,12 @@ class HallHandler:
             buf_size = len(buffer)
             self.reach_field_fine(v)
             tmp = self.read_concurrently()
-            if buf_size < 201:
+            if buf_size < 51:
                 buffer.append(tmp)
             else:
                 self.write_buffer(buffer)
+                # UI: signal new data
+                self.signaller.new_data_available.emit()
                 buffer.clear()
                 buffer.append(tmp)
         
@@ -68,6 +70,8 @@ class HallHandler:
         buf_size = len(buffer)
         if not buf_size == 1:
             self.write_buffer(buffer)
+            # UI: signal new data
+            self.signaller.new_data_available.emit()
             buffer.clear()
             buffer.append(tmp)
         
