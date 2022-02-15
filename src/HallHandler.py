@@ -45,10 +45,29 @@ class HallHandler:
 
            
     def measure_with_wave(self):
+        buffer = []
         for v in self.m_hall.set_field:
+            buf_size = len(buffer)
             self.reach_field_fine(v)
-            # print("reaching {:10.3f} mT".format(v), end="\r")
-            print(self.read_concurrently(), end="\n")
+            tmp = self.read_concurrently()
+            if buf_size < 201:
+                buffer.append(tmp)
+            else:
+                print(buffer)
+                self.write_buffer(buffer)
+                buffer.clear()
+                buffer.append(tmp)
+        
+        # ensure remaining data is written out in case the buffer is not full!
+        buf_size = len(buffer)
+        if not buf_size == 1:
+            print(buffer)
+            self.write_buffer(buffer)
+            buffer.clear()
+            buffer.append(tmp)
+        
+            
+            # print(self.read_concurrently(), end="\n")
     
 
     def reach_field_fine(self, b) -> STATUS:
@@ -129,8 +148,8 @@ class HallHandler:
         with futures.ThreadPoolExecutor(max_workers=2) as e:
             e.submit(HallHandler.async_field_handle, res_f, self.m_hall)
             e.submit(HallHandler.async_xy_handle, res_xy, self.m_hall)
-
-        return [res_f, res_xy]
+        tmp = [res_f, res_xy]
+        return [i for s in tmp for i in s]
 
     @staticmethod
     def async_field_handle(r, hall):
@@ -145,3 +164,14 @@ class HallHandler:
         r[0] = time.time()
         r[1] = tmp[0]
         r[2] = tmp[1]
+
+    def write_buffer(self, data):
+        tmp_p = self.measure["data"]["path"]
+        tmp_id = str(self.uuid)
+        if tmp_p == "":
+            self.filename = "./results/{}/data_{}.csv".format(tmp_id, tmp_id)
+        else:
+            self.filename = tmp_p + "{}/data_{}.csv".format(tmp_id, tmp_id)
+        helper.write_data(self.filename, data)
+        
+        

@@ -220,7 +220,7 @@ class MainWidget(QWidget):
         tmp_p = self.conf["data"]["path"]
         tmp_id = str(self.m_handler.uuid)
         if tmp_p == "":
-            tmp_p = "./tmp_conf/config_{}.yaml".format(tmp_id)
+            tmp_p = "./results/{}/config_{}.yaml".format(tmp_id, tmp_id)
         else:
             tmp_p += "{}/config_{}.yaml".format(tmp_id, tmp_id)
 
