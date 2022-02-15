@@ -1,3 +1,6 @@
+data:
+  path: ''
+  sample: ''
 wave:
   form: tirangle
   zero: 0

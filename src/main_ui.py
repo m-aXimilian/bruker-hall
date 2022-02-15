@@ -122,9 +122,12 @@ class MainWidget(QWidget):
 
     
     def do_measure(self):
+        self.m_handler.already_measured = True
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
         self.disable_button(self.start_button)
+        self.disable_button(self.load_conf_button)
+        self.disable_button(self.save_conf_button)
         m_th = threading.Thread(target=self.meas_thread, args=(self,))
         m_th.start()
 
@@ -132,11 +135,11 @@ class MainWidget(QWidget):
             
     @staticmethod
     def meas_thread(n):
-        for v in n.m_handler.m_hall.set_field:
-            n.m_handler.reach_field_fine(v)
-            print("reaching {:10.3f} mT".format(v), end="\r")
+        n.m_handler.measure_with_wave()
         n.enable_button(n.start_button)
-        n.status_bar_info("done.")
+        n.enable_button(n.load_conf_button)
+        n.enable_button(n.save_conf_button)
+        n.status_bar_info("done. \t results saved to: %s" %os.path.abspath(n.m_handler.filename))
         
 
     def show_connect_b(self):
@@ -154,13 +157,12 @@ class MainWidget(QWidget):
                      "settings": self.__dict_convert(self.meas),
                      "data": self.__dict_convert(self.data)
                      }
-        self.m_handler = hall.HallHandler(self.conf)
-
+       
 
     def override_default_dict(self, file_name):
         self.default_conf = helper.loadYAMLConfig(file_name)
-        self.m_handler = hall.HallHandler(self.default_conf)
-        
+        self.conf = self.default_conf
+
      
     def __dict_convert(self, orig):
         res = {}
@@ -216,10 +218,11 @@ class MainWidget(QWidget):
     def save_conf_button_handler(self):
         self.generate_config_dict()
         tmp_p = self.conf["data"]["path"]
+        tmp_id = str(self.m_handler.uuid)
         if tmp_p == "":
-            tmp_p = "./tmp_conf/test.yaml"
+            tmp_p = "./results/{}/config_{}.yaml".format(tmp_id, tmp_id)
         else:
-            tmp_p += "conf/test.yaml"
+            tmp_p += "{}/config_{}.yaml".format(tmp_id, tmp_id)
 
         self.status_bar_info("wrote config to: %s" % os.path.abspath(tmp_p))
         self.disable_button(self.save_conf_button)
@@ -227,6 +230,12 @@ class MainWidget(QWidget):
         os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
         with open(tmp_p, 'w') as out:
             yaml.dump(self.conf, out)
+        
+        if self.m_handler.already_measured:
+            self.m_handler = hall.HallHandler(self.conf)
+        else: 
+            self.m_handler.override_measure_config(self.conf)
+
             
 
     def load_conf_button_handler(self):
@@ -237,6 +246,12 @@ class MainWidget(QWidget):
 
         self.override_default_dict(f[0])
         self.make_config_tabs(self.conf_layout)
+        
+
+        if self.m_handler.already_measured:
+            self.m_handler = hall.HallHandler(self.conf)
+        else: 
+            self.m_handler.override_measure_config(self.conf)
         
 
     def disable_button(self, button):
