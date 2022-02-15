@@ -50,6 +50,6 @@ def main():
     app.exec()
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='log/gui.log', filemode='w', level=logging.DEBUG)
+    logging.basicConfig(filename='log/gui.log', filemode='w', level=logging.INFO)
     main()
 

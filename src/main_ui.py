@@ -122,6 +122,7 @@ class MainWidget(QWidget):
 
     
     def do_measure(self):
+        self.m_handler.already_measured = True
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
         self.disable_button(self.start_button)
@@ -138,7 +139,7 @@ class MainWidget(QWidget):
         n.enable_button(n.start_button)
         n.enable_button(n.load_conf_button)
         n.enable_button(n.save_conf_button)
-        n.status_bar_info("done.")
+        n.status_bar_info("done. \t results saved to: %s" %os.path.abspath(n.m_handler.filename))
         
 
     def show_connect_b(self):
@@ -156,13 +157,12 @@ class MainWidget(QWidget):
                      "settings": self.__dict_convert(self.meas),
                      "data": self.__dict_convert(self.data)
                      }
-        self.m_handler = hall.HallHandler(self.conf)
-
+       
 
     def override_default_dict(self, file_name):
         self.default_conf = helper.loadYAMLConfig(file_name)
-        self.m_handler = hall.HallHandler(self.default_conf)
-        
+        self.conf = self.default_conf
+
      
     def __dict_convert(self, orig):
         res = {}
@@ -230,6 +230,12 @@ class MainWidget(QWidget):
         os.makedirs(os.path.dirname(tmp_p), exist_ok=True)
         with open(tmp_p, 'w') as out:
             yaml.dump(self.conf, out)
+        
+        if self.m_handler.already_measured:
+            self.m_handler = hall.HallHandler(self.conf)
+        else: 
+            self.m_handler.override_measure_config(self.conf)
+
             
 
     def load_conf_button_handler(self):
@@ -240,6 +246,12 @@ class MainWidget(QWidget):
 
         self.override_default_dict(f[0])
         self.make_config_tabs(self.conf_layout)
+        
+
+        if self.m_handler.already_measured:
+            self.m_handler = hall.HallHandler(self.conf)
+        else: 
+            self.m_handler.override_measure_config(self.conf)
         
 
     def disable_button(self, button):

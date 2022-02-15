@@ -19,6 +19,7 @@ from src.States import STATUS, DIRECTION
 
 class UiSignals(QObject):
     new_b_field = pyqtSignal()
+    new_data_available = pyqtSignal()
 
 
 class HallHandler:
@@ -35,6 +36,8 @@ class HallHandler:
         self.m_hall = HallMeasurement(self.measure)
         self.last_b = 0
 
+        self.already_measured = False
+
         self.signaller = UiSignals()
         self.update_id()
 
@@ -43,6 +46,10 @@ class HallHandler:
     def update_id(self):
         self.uuid = uuid.uuid1()
 
+
+    def override_measure_config(self, conf):
+        self.measure = conf
+        self.m_hall = HallMeasurement(self.measure)
            
     def measure_with_wave(self):
         buffer = []
@@ -53,7 +60,6 @@ class HallHandler:
             if buf_size < 201:
                 buffer.append(tmp)
             else:
-                print(buffer)
                 self.write_buffer(buffer)
                 buffer.clear()
                 buffer.append(tmp)
@@ -61,7 +67,6 @@ class HallHandler:
         # ensure remaining data is written out in case the buffer is not full!
         buf_size = len(buffer)
         if not buf_size == 1:
-            print(buffer)
             self.write_buffer(buffer)
             buffer.clear()
             buffer.append(tmp)
