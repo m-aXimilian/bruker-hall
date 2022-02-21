@@ -181,6 +181,6 @@ class HallHandler:
             self.filename = "./results/{}/data_{}.csv".format(tmp_id, tmp_id)
         else:
             self.filename = tmp_p + "{}/data_{}.csv".format(tmp_id, tmp_id)
-        helper.write_data(self.filename, data)
+        helper.write_data(self.filename, data, "time field, field mT, time lockin, x, y")
         
         

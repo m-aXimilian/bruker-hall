@@ -1,6 +1,7 @@
 from concurrent.futures import thread
 from faulthandler import disable
 import os, sys, yaml
+from turtle import width
 import numpy as np
 import logging
 import threading
@@ -202,12 +203,27 @@ class MainWidget(QWidget):
 
     def live_plot(self):
         data = np.genfromtxt(self.m_handler.filename, skip_header=2, delimiter=',')
-        self.plot_data(self.field_plot, data)
+        # self.plot_data(self.field_plot, data)
+        field_pen = pg.mkPen(color=(0,105,80), width=2)
+        x_pen = pg.mkPen(color=(255,0,0))
+        y_pen = pg.mkPen(color=(0,0,255))
+        self.plot_pyqt(self.field_plot, data[:,0]-data[0,0], data[:,1], field_pen, "B-Field", {'left': "B/mT", 'bottom': "t/s"})
+        self.plot_pyqt(self.x_plot, data[:,1], data[:,3], x_pen, "X-Value", {'left': "V/V", 'bottom': "B/mT"})
+        self.plot_pyqt(self.y_plot, data[:,1], data[:,4], y_pen, "Y-Value", {'left': "V/V", 'bottom': "B/mT"})
+        
         
 
     def plot_data(self, plt_widget, data):
         pen = pg.mkPen(color=(0,105,80))
         plt_widget.plot(data[:,0], data[:,1], pen=pen)
+
+    def plot_pyqt(self, plt_widget, x, y, pen=None, title=None, labels=None):
+        plt_widget.plot(x, y, pen=pen)
+        plt_widget.setTitle(title)
+        plt_widget.setLabel('left', labels['left'])
+        plt_widget.setLabel('bottom', labels['bottom'])
+        plt_widget.showGrid(x=True, y=True)
+
 
 
     def make_start_button(self, start_widget):
