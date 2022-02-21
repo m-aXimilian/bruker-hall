@@ -25,7 +25,7 @@ class UiSignals(QObject):
 class HallHandler:
     def __init__(self, config_file = ""):
         if os.name == 'posix':
-            self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
+            self.measure = helper.loadYAMLConfig("config/measurement.yaml")
         else:
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 

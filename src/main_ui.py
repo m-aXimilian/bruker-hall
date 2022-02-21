@@ -68,7 +68,7 @@ class MainWidget(QWidget):
     def __init__(self,parent):
         super().__init__()
         if os.name == 'posix':
-            self.default_conf = helper.loadYAMLConfig("../config/measurement.yaml")
+            self.default_conf = helper.loadYAMLConfig("config/measurement.yaml")
         else:
             self.default_conf = helper.loadYAMLConfig("config/measurement.yaml")
         # self.setGeometry(100, 100, 1000, 600)
@@ -82,19 +82,22 @@ class MainWidget(QWidget):
 
         outer_layout = QHBoxLayout()
         left_col = QVBoxLayout()
+        right_col = QVBoxLayout()
+        xy_row = QHBoxLayout()
         left_col.setSpacing(10)
         conf_button_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
-        self.plot_layout = pg.PlotWidget()
+        self.field_plot = pg.PlotWidget()
+        self.x_plot = pg.PlotWidget()
+        self.y_plot = pg.PlotWidget()
         
         # outmost layout
         self.setLayout(outer_layout)
 
         # add plot layout
-        self.configure_plot(self.plot_layout)
-        # self.plot_data(self.plot_layout, test_data)
-        
-
+        self.configure_plot(self.field_plot)
+        self.configure_plot(self.x_plot)   
+        self.configure_plot(self.y_plot)
 
         # add configuration layout
         self.conf_layout = QTabWidget()
@@ -112,11 +115,18 @@ class MainWidget(QWidget):
         left_col.addLayout(conf_button_layout)
         left_col.addWidget(self.conf_layout)
         left_col.addLayout(status_layout)
-        self.make_start_button(left_col) 
+        self.make_start_button(left_col)
+
+        # glue the right col (plots)
+        xy_row.addWidget(self.x_plot)
+        xy_row.addWidget(self.y_plot)
+        right_col.addLayout(xy_row)
+        right_col.addWidget(self.field_plot)
 
         # set to the outer layout       
         outer_layout.addLayout(left_col,1)
-        outer_layout.addWidget(self.plot_layout,3)
+        outer_layout.addLayout(right_col, 3)
+        # outer_layout.addWidget(self.field_plot,3)
 
 
     def connect_devices(self):
@@ -125,7 +135,7 @@ class MainWidget(QWidget):
     
     def do_measure(self):
         self.m_handler.signaller.new_data_available.connect(self.live_plot)
-        self.plot_layout.clear()
+        self.field_plot.clear()
         self.m_handler.already_measured = True
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
@@ -192,7 +202,7 @@ class MainWidget(QWidget):
 
     def live_plot(self):
         data = np.genfromtxt(self.m_handler.filename, skip_header=2, delimiter=',')
-        self.plot_data(self.plot_layout, data)
+        self.plot_data(self.field_plot, data)
         
 
     def plot_data(self, plt_widget, data):

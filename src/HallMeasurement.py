@@ -24,9 +24,9 @@ class HallMeasurement:
     """Container for Bruker Measurement."""
     def __init__(self, config_file = ""):
         if os.name == 'posix':
-            self.params = helper.loadYAMLConfig("../config/devices.yaml")
-            self.lookup = helper.loadYAMLConfig("../config/B-field-lookup.yaml")
-            self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
+            self.params = helper.loadYAMLConfig("config/devices.yaml")
+            self.lookup = helper.loadYAMLConfig("config/B-field-lookup.yaml")
+            self.measure = helper.loadYAMLConfig("config/measurement.yaml")
         else:
             self.params = helper.loadYAMLConfig("config/devices.yaml")
             self.lookup = helper.loadYAMLConfig("config/B-field-lookup.yaml")
