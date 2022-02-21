@@ -1,6 +1,7 @@
 data:
   path: ''
   sample: ''
+  comment: ''
 wave:
   form: tirangle
   zero: 0

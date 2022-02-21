@@ -137,6 +137,8 @@ class MainWidget(QWidget):
     def do_measure(self):
         self.m_handler.signaller.new_data_available.connect(self.live_plot)
         self.field_plot.clear()
+        self.x_plot.clear()
+        self.y_plot.clear()
         self.m_handler.already_measured = True
         self.show_connect_b()
         self.status_bar_info("Running measurement...")
@@ -205,8 +207,8 @@ class MainWidget(QWidget):
         data = np.genfromtxt(self.m_handler.filename, skip_header=2, delimiter=',')
         # self.plot_data(self.field_plot, data)
         field_pen = pg.mkPen(color=(0,105,80), width=2)
-        x_pen = pg.mkPen(color=(255,0,0))
-        y_pen = pg.mkPen(color=(0,0,255))
+        x_pen = pg.mkPen(color=(255,0,0), width=2)
+        y_pen = pg.mkPen(color=(0,0,255), width=2)
         self.plot_pyqt(self.field_plot, data[:,0]-data[0,0], data[:,1], field_pen, "B-Field", {'left': "B/mT", 'bottom': "t/s"})
         self.plot_pyqt(self.x_plot, data[:,1], data[:,3], x_pen, "X-Value", {'left': "V/V", 'bottom': "B/mT"})
         self.plot_pyqt(self.y_plot, data[:,1], data[:,4], y_pen, "Y-Value", {'left': "V/V", 'bottom': "B/mT"})
@@ -354,11 +356,12 @@ class MainWidget(QWidget):
     def data_conf(self):
         tab = QWidget()
         t_l = QFormLayout()
-        self.data = {"sample": QLineEdit(), "path": QLineEdit()}
+        self.data = {"sample": QLineEdit(), "path": QLineEdit(), "comment": QLineEdit()}
         
         if "data" in self.default_conf:
             self.data["sample"].setText(self.default_conf["data"]["sample"])
             self.data["path"].setText(self.default_conf["data"]["path"])
+            self.data["comment"].setText(self.default_conf["data"]["comment"])
 
 
         for k, v in self.data.items():
@@ -369,7 +372,6 @@ class MainWidget(QWidget):
                 v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
             if isinstance(v, (QSpinBox, QDoubleSpinBox)):
                 v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
-            
             
         tab.setLayout(t_l)
         return tab
