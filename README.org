@@ -65,7 +65,7 @@ the source frequency. For every value in of the waveform array
 The devices from the [[file:config/devices.yaml][devices config]] must be attached and known to the system.
 Run the ~main.py~ file. This will instantiate the following UI
 #+name: ui-screenshot
-#+html: <p align="center"><img src="doc/UI-screenshot_windows.png" width="60%"></p>
+#+html: <p align="center"><img src="doc/UI-screenshot_windows.png" width="100%"></p>
 There are 3 possibilites to start a measurement:
 1. configure nothing and hit ``Start Measurement''
   This will take the default [[file:config/measurement.yaml][measurement config]] and save the results at ~./results~
