@@ -14,5 +14,4 @@ settings:
   wait-b: 0.5  # (s) wait until next iteration
   timeout: 20  # (s) until field reached
   bruker-const: 0.8 # (s/mT) time-constant of the main coils
-lockin:
   f: 833.33

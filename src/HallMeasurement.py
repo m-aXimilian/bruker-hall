@@ -35,7 +35,7 @@ class HallMeasurement:
         if config_file:
             self.measure = config_file
 
-        self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"])
+        self.lockin = sr830.Lockin(self.params["devices"]["lockin"]["id"], self.measure["settings"])
 
         self.__generateLookups()
         self.__generateWave()

@@ -46,6 +46,7 @@ name_yaml_lookup = {
     "Zero (p.u.)": "zero",
     "Amplitude (mT)": "amp",
     "N (n.v.)": "N",
+    "f (Hz)": "f",
     "Sample": "sample",
     "Path": "path",
 }
@@ -342,14 +343,15 @@ class MainWidget(QWidget):
             self.meas[k].setValue(v)
             t_l.addRow(yaml_name_lookup[k], self.meas[k])
 
+        self.meas["f"].setRange(0.001, 102000)
+        self.meas["f"].setValue(self.default_conf["settings"]["f"])
+
         for v in self.meas.values():
             if isinstance(v, QLineEdit):
                 v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
             if isinstance(v, (QSpinBox, QDoubleSpinBox)):
                 v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
-
-
-
+                
         tab.setLayout(t_l)
         return tab
 
@@ -372,6 +374,7 @@ class MainWidget(QWidget):
                 v.textChanged.connect((lambda: self.enable_button(self.save_conf_button)))
             if isinstance(v, (QSpinBox, QDoubleSpinBox)):
                 v.valueChanged.connect((lambda: self.enable_button(self.save_conf_button)))
+            
             
         tab.setLayout(t_l)
         return tab

@@ -9,9 +9,9 @@ import src.helpers as helper
 
 class Lockin(SR830):
     """GPIB communication with a Stanford Research SR830 Lockin amplifier."""
-    def __init__(self, resourceName, **kwargs):
+    def __init__(self, resourceName, params, **kwargs):
         super().__init__(resourceName, **kwargs)
-        self.params = helper.loadYAMLConfig("config/measurement.yaml")["lockin"]
+        self.params = params
         self.__setup()
 
     def __setup(self):
