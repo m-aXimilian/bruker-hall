@@ -43,14 +43,12 @@ class HallHandler:
         self.signaller = UiSignals()
         self.update_id()
 
-
     def update_id(self):
         self.uuid = uuid.uuid1()
 
     def override_measure_config(self, conf):
         self.measure = conf
         self.m_hall = HallMeasurement(self.measure)
-
 
     def measure_with_wave(self):
         # pass the first value of the set-field vector to the reach_field_coarse function
@@ -201,7 +199,6 @@ class HallHandler:
 
         return tmp
 
-
     def read_concurrently(self):
         res_f = [None] * 2
         res_xy = [None] * 3
@@ -211,7 +208,6 @@ class HallHandler:
         tmp = [res_f, res_xy]
         return [i for s in tmp for i in s]
 
-
     @staticmethod
     def async_field_handle(r, hall):
         time.sleep(0.005)  # xy read from gpib is slower than daq-read
@@ -219,14 +215,12 @@ class HallHandler:
         r[0] = time.time()
         r[1] = tmp
 
-
     @staticmethod
     def async_xy_handle(r, hall):
         tmp = hall.lockin.xy
         r[0] = time.time()
         r[1] = tmp[0]
         r[2] = tmp[1]
-
 
     def write_buffer(self, data):
         tmp_p = self.measure["data"]["path"]
