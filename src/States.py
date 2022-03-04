@@ -1,5 +1,6 @@
 from enum import IntFlag
 
+
 class STATUS(IntFlag):
     ERROR = -1
     OK = 0
