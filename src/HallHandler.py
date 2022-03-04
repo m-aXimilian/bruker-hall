@@ -153,7 +153,7 @@ class HallHandler:
 
     def read_concurrently(self):
         res_f = [None]*2
-        res_xy = [None]*4
+        res_xy = [None]*3
         with futures.ThreadPoolExecutor(max_workers=2) as e:
             e.submit(HallHandler.async_field_handle, res_f, self.m_hall)
             e.submit(HallHandler.async_xy_handle, res_xy, self.m_hall)
@@ -170,11 +170,9 @@ class HallHandler:
     @staticmethod
     def async_xy_handle(r, hall):
         tmp = hall.lockin.xy
-        phase = hall.lockin.phase
         r[0] = time.time()
         r[1] = tmp[0]
         r[2] = tmp[1]
-        r[3] = phase
 
     def write_buffer(self, data):
         tmp_p = self.measure["data"]["path"]
@@ -183,6 +181,6 @@ class HallHandler:
             self.filename = "./results/{}/data_{}.csv".format(tmp_id, tmp_id)
         else:
             self.filename = tmp_p + "{}/data_{}.csv".format(tmp_id, tmp_id)
-        helper.write_data(self.filename, data, "time field, field mT, time lockin, x, y, phase", self.measure["data"]["comment"])
+        helper.write_data(self.filename, data, "time field, field mT, time lockin, x, y", self.measure["data"]["comment"])
         
         
