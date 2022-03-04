@@ -17,21 +17,22 @@ from src.HallMeasurement import HallMeasurement
 import src.helpers as helper
 from src.States import STATUS, DIRECTION
 
+
 class UiSignals(QObject):
     new_b_field = pyqtSignal()
     new_data_available = pyqtSignal()
 
 
 class HallHandler:
-    def __init__(self, config_file = ""):
-        if os.name == 'posix':
+    def __init__(self, config_file=""):
+        if os.name == "posix":
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
         else:
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
 
         if config_file:
             self.measure = config_file
-        
+
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement(self.measure)
         self.last_b = 0
@@ -41,15 +42,12 @@ class HallHandler:
         self.signaller = UiSignals()
         self.update_id()
 
-
     def update_id(self):
         self.uuid = uuid.uuid1()
-
 
     def override_measure_config(self, conf):
         self.measure = conf
         self.m_hall = HallMeasurement(self.measure)
-
 
     def measure_with_wave(self):
         buffer = []
@@ -65,7 +63,7 @@ class HallHandler:
                 self.signaller.new_data_available.emit()
                 buffer.clear()
                 buffer.append(tmp)
-        
+
         # ensure remaining data is written out in case the buffer is not full!
         buf_size = len(buffer)
         if not buf_size == 1:
@@ -74,27 +72,27 @@ class HallHandler:
             self.signaller.new_data_available.emit()
             buffer.clear()
             buffer.append(tmp)
-        
-            
+
             # print(self.read_concurrently(), end="\n")
-    
 
     def reach_field_fine(self, b) -> STATUS:
-        """Writes translated B-field set-values to the xantrex power supply 
+        """Writes translated B-field set-values to the xantrex power supply
         and the PID-controller. While the field is not reached and the timeout
         is not exceeded, the function will block.
 
         Args:
-        	b (num): B-field value to reach (mT)
-        
+                b (num): B-field value to reach (mT)
+
         Returns:
-        	[:class:`~STATUS`]: Status info of"""
+                [:class:`~STATUS`]: Status info of"""
         c = abs(b - self.last_b)
         if c > self.measure["settings"]["max-inc"]:
-            e = "Field increment with {}mT higher than the allowed {}mT".format(c, self.measure["settings"]["max-inc"])
+            e = "Field increment with {}mT higher than the allowed {}mT".format(
+                c, self.measure["settings"]["max-inc"]
+            )
             logging.error(e)
             raise TypeError(e)
-        
+
         direction = self.field_diection(self.last_b, b)
 
         self.last_b = b
@@ -107,13 +105,13 @@ class HallHandler:
 
         xan_set = self.m_hall.single_xanterx_set(b, direction)
         pid_set = self.m_hall.single_pid_set(b)
-        time.sleep(self.measure["settings"]["bruker-const"]*c)
+        time.sleep(self.measure["settings"]["bruker-const"] * c)
 
         self.m_hall.writeVolt(self.m_hall.tasks["xantrex-writer"], xan_set)
-        self.m_hall.writeVolt(self.m_hall.tasks ["pid-writer"], pid_set)
+        self.m_hall.writeVolt(self.m_hall.tasks["pid-writer"], pid_set)
 
         logging.debug("%f to xantrex AO, %f to pid AO" % (xan_set, pid_set))
-        
+
         start = time.time()
         while delta_tmp > self.measure["settings"]["delta-start"]:
             timeout = (time.time() - start) > self.measure["settings"]["timeout"]
@@ -128,18 +126,17 @@ class HallHandler:
         logging.info("Reached set field of {:10.2f} mT".format(b))
         return STATUS.OK
 
-
     @staticmethod
     def field_diection(b_current, b_next) -> DIRECTION:
         """Calculates a direction based on a current and a next value.
 
         Args:
-        	b_current (num): current value
-        	b_next (num): next value
-        
+                b_current (num): current value
+                b_next (num): next value
+
         Returns:
-        	[:class:`~DIRECTION`]: A direction of type """
-        
+                [:class:`~DIRECTION`]: A direction of type"""
+
         tmp = DIRECTION.NONE
 
         s = b_next - b_current
@@ -151,24 +148,21 @@ class HallHandler:
 
         return tmp
 
-
     def read_concurrently(self):
-        res_f = [None]*2
-        res_xy = [None]*3
+        res_f = [None] * 2
+        res_xy = [None] * 3
         with futures.ThreadPoolExecutor(max_workers=2) as e:
             e.submit(HallHandler.async_field_handle, res_f, self.m_hall)
             e.submit(HallHandler.async_xy_handle, res_xy, self.m_hall)
         tmp = [res_f, res_xy]
         return [i for s in tmp for i in s]
 
-
     @staticmethod
     def async_field_handle(r, hall):
-        time.sleep(0.005) # xy read from gpib is slower than daq-read
+        time.sleep(0.005)  # xy read from gpib is slower than daq-read
         tmp = hall.read_field()
         r[0] = time.time()
         r[1] = tmp
-
 
     @staticmethod
     def async_xy_handle(r, hall):
@@ -176,7 +170,6 @@ class HallHandler:
         r[0] = time.time()
         r[1] = tmp[0]
         r[2] = tmp[1]
-
 
     def write_buffer(self, data):
         tmp_p = self.measure["data"]["path"]
@@ -186,14 +179,13 @@ class HallHandler:
         else:
             self.filename = tmp_p + "{}/data_{}.csv".format(tmp_id, tmp_id)
         helper.write_data(
-            self.filename, 
-            data, 
-            "time field, field mT, time lockin, x, y", 
-            "{com}, phase={ph}, sensitivity={sens}, time constant={tc}"
-                .format(
-                    com = self.measure["data"]["comment"],
-                    ph = self.m_hall.lockin.phase,
-                    sens = self.m_hall.lockin.sensitivity,
-                    tc = self.m_hall.lockin.time_constant
-                )
-            )
+            self.filename,
+            data,
+            "time field, field mT, time lockin, x, y",
+            "{com}, phase={ph}, sensitivity={sens}, time constant={tc}".format(
+                com=self.measure["data"]["comment"],
+                ph=self.m_hall.lockin.phase,
+                sens=self.m_hall.lockin.sensitivity,
+                tc=self.m_hall.lockin.time_constant,
+            ),
+        )
