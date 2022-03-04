@@ -43,6 +43,10 @@ class HallHandler:
         self.signaller = UiSignals()
         self.update_id()
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> write phase, sensitivity and time to csv-comment
     def update_id(self):
         self.uuid = uuid.uuid1()
 
@@ -50,6 +54,10 @@ class HallHandler:
         self.measure = conf
         self.m_hall = HallMeasurement(self.measure)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> write phase, sensitivity and time to csv-comment
     def measure_with_wave(self):
         # pass the first value of the set-field vector to the reach_field_coarse function
         # to prevent an out-of-reach jump
@@ -199,6 +207,7 @@ class HallHandler:
 
         return tmp
 
+
     def read_concurrently(self):
         res_f = [None]*2
         res_xy = [None]*3
@@ -208,12 +217,14 @@ class HallHandler:
         tmp = [res_f, res_xy]
         return [i for s in tmp for i in s]
 
+
     @staticmethod
     def async_field_handle(r, hall):
         time.sleep(0.005)  # xy read from gpib is slower than daq-read
         tmp = hall.read_field()
         r[0] = time.time()
         r[1] = tmp
+
 
     @staticmethod
     def async_xy_handle(r, hall):
@@ -222,6 +233,7 @@ class HallHandler:
         r[1] = tmp[0]
         r[2] = tmp[1]
 
+
     def write_buffer(self, data):
         tmp_p = self.measure["data"]["path"]
         tmp_id = str(self.uuid)
@@ -229,6 +241,15 @@ class HallHandler:
             self.filename = "./results/{}/data_{}.csv".format(tmp_id, tmp_id)
         else:
             self.filename = tmp_p + "{}/data_{}.csv".format(tmp_id, tmp_id)
-        helper.write_data(self.filename, data, "time field, field mT, time lockin, x, y", self.measure["data"]["comment"])
-        
-        
+        helper.write_data(
+            self.filename, 
+            data, 
+            "time field, field mT, time lockin, x, y", 
+            "{com}, phase={ph}, sensitivity={sens}, time constant={tc}"
+                .format(
+                    com = self.measure["data"]["comment"],
+                    ph = self.m_hall.lockin.phase,
+                    sens = self.m_hall.lockin.sensitivity,
+                    tc = self.m_hall.lockin.time_constant
+                )
+            )
