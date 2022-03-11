@@ -5,6 +5,7 @@ data:
 wave:
   form: tirangle
   zero: 0
+  offset: 0 # (mT) offset of the B-field
   amp: 10
   N: 100
 settings:
@@ -15,5 +16,5 @@ settings:
   timeout: 20  # (s) until field reached
   bruker-const: 0.8 # (s/mT) time-constant of the main coils
   f: 833.33
-  max-field: 1000 # maximum applicable B-field (mT)
-  min-field: -10 # minimum applicable B-field (mT)
+  max-field: 1000 # (mT)maximum applicable B-field 
+  min-field: -10 # (mT) minimum applicable B-field

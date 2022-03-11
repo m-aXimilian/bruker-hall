@@ -1,7 +1,7 @@
 from concurrent.futures import thread
 from faulthandler import disable
 import os, sys, yaml
-from turtle import width
+
 import numpy as np
 import logging
 import threading
@@ -44,11 +44,14 @@ name_yaml_lookup = {
     "bruker-const (s/mT)": "bruker-const",
     "Form (n.v.)": "form",
     "Zero (p.u.)": "zero",
+    "Offset (mT)": "offset",
     "Amplitude (mT)": "amp",
     "N (n.v.)": "N",
     "f (Hz)": "f",
     "Sample": "sample",
     "Path": "path",
+    "Max B-field": "max-field",
+    "Min B-field": "min-field",
 }
 
 yaml_name_lookup = {v: k for k, v in name_yaml_lookup.items()}
@@ -308,6 +311,7 @@ class MainWidget(QWidget):
         self.wave = {
             "form": QLineEdit(),
             "zero": QDoubleSpinBox(),
+            "offset": QDoubleSpinBox(),
             "amp": QSpinBox(),
             "N": QSpinBox()
         }
@@ -316,6 +320,8 @@ class MainWidget(QWidget):
         self.wave["zero"].setValue(w["zero"])
         self.wave["zero"].setRange(0.0,1.0)
         self.wave["zero"].setSingleStep(0.1)
+        self.wave["offset"].setRange(-10.0,100.0)
+        self.wave["offset"].setSingleStep(1.0)
         self.wave["amp"].setRange(-10,1200)
         self.wave["amp"].setValue(w["amp"]),
         self.wave["N"].setRange(10,100000)
