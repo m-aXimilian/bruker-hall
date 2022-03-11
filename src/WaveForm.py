@@ -12,8 +12,12 @@ class WaveForm:
         zero (int, optional): pre- and post zero periode. Defaults to 0, must be given in p.u.
     """
 
-    def __init__(self, amp, n, zero=0) -> None:
+    def __init__(self, amp, n, zero=0, offset=0) -> None:
         self._amp = amp
+        if abs(offset) < amp * 0.5:
+            self._offset = offset
+        else:
+            self._offset = 0
         self.N = n
         if zero > 1 or zero < 0:
             raise ValueError(
@@ -32,6 +36,10 @@ class WaveForm:
         """
         no_val = int(self._zero * self.N)
         ramp = self.N - 2 * no_val
+
+        if self._offset != 0:
+            return self.__triag_offset(no_val, ramp)
+
         saw = (
             (signal.sawtooth(2 * np.pi * np.linspace(0, 1, ramp), 0.5) + 1)
             / 2
@@ -39,6 +47,12 @@ class WaveForm:
         )
         no_val_vec = np.zeros(shape=(no_val,))
         return np.append(np.append(no_val_vec, saw), no_val_vec)
+
+    def __triag_offset(self, no_val, ramp):
+        """Ugly array stitching to enable field offset."""
+        baseline = np.ones(shape=(no_val,)) * self._offset
+        rup = np.linspace(self._offset, self._amp, int(ramp / 2))
+        return np.append(np.append(np.append(baseline, rup), np.flip(rup)), baseline)
 
     @staticmethod
     def linear(start, stop, step):
