@@ -15,3 +15,5 @@ settings:
   timeout: 20  # (s) until field reached
   bruker-const: 0.8 # (s/mT) time-constant of the main coils
   f: 833.33
+  max-field: 1000 # maximum applicable B-field (mT)
+  min-field: -10 # minimum applicable B-field (mT)

@@ -15,6 +15,7 @@ sys.path.append(parentdir + "/fmr-py/src")
 
 from src.HallMeasurement import HallMeasurement
 import src.helpers as helper
+from src.WaveForm import WaveForm
 from src.States import STATUS, DIRECTION
 
 
@@ -50,6 +51,13 @@ class HallHandler:
         self.m_hall = HallMeasurement(self.measure)
 
     def measure_with_wave(self):
+        # pass the first value of the set-field vector to the reach_field_coarse function
+        # to prevent an out-of-reach jump
+
+        if not self.reach_field_coarse(self.m_hall.set_field[0]) == STATUS.OK:
+            logging.errror("Aborting in %s" % HallHandler.measure_with_wave.__name__)
+            return
+
         buffer = []
         for v in self.m_hall.set_field:
             buf_size = len(buffer)
@@ -66,19 +74,16 @@ class HallHandler:
 
         # ensure remaining data is written out in case the buffer is not full!
         buf_size = len(buffer)
-        if not buf_size == 1:
+        if not buf_size == 0:
             self.write_buffer(buffer)
             # UI: signal new data
             self.signaller.new_data_available.emit()
             buffer.clear()
-            buffer.append(tmp)
-
-            # print(self.read_concurrently(), end="\n")
 
     def reach_field_fine(self, b) -> STATUS:
         """Writes translated B-field set-values to the xantrex power supply
         and the PID-controller. While the field is not reached and the timeout
-        is not exceeded, the function will block.
+        is not exceeded, the function will block the calling thread.
 
         Args:
                 b (num): B-field value to reach (mT)
@@ -91,7 +96,7 @@ class HallHandler:
                 c, self.measure["settings"]["max-inc"]
             )
             logging.error(e)
-            raise TypeError(e)
+            raise ValueError(e)
 
         direction = self.field_diection(self.last_b, b)
 
@@ -127,10 +132,46 @@ class HallHandler:
         return STATUS.OK
 
     def reach_field_coarse(self, b) -> STATUS:
-        # measure is field
-        # check offset
-        # generate vector of set-values
-        pass
+        """Pass any B-field value to this function. It will generate a linear vector based on the current B-field measurement and hand it over value by value to the :meth:`~HallHandler.reach_field_fine` method if it is within the configured boundaries.
+
+        Returns:
+                [:class:`~STATUS`]: status of the field-reach process"""
+        tmp_inc = self.measure["settings"]["max-inc"]
+        min_b, max_b = (
+            self.measure["settings"]["min-field"],
+            self.measure["settings"]["max-field"],
+        )
+        current_field = self.m_hall.read_field()
+
+        if abs(current_field) < 0.005:
+            # B-field value smaller than 5µT hints issues with the hall probe rather than sufficient measurement
+            # don't try to reach b in that case
+            logging.error("Power supply to the hall probe turned on???")
+            return STATUS.ERROR
+
+        if not b in range(min_b, max_b + 1):
+            raise ValueError("Desired b field not in valid range!")
+
+        if (abs(current_field - b)) < tmp_inc:
+            return STATUS.OK
+
+        reach_vector = WaveForm.linear(round(current_field), b, tmp_inc)
+        fine_reach_ok = True
+
+        for v in reach_vector:
+            try:
+                status = self.reach_field_fine(v)
+                if not status == STATUS.OK:
+                    fine_reach_ok = False
+            except ValueError:
+                return STATUS.ERROR
+
+        if not fine_reach_ok:
+            logging.warning(
+                "Some errors occured during coarse reaching of the base B-field."
+            )
+
+        return STATUS.OK
 
     @staticmethod
     def field_diection(b_current, b_next) -> DIRECTION:
