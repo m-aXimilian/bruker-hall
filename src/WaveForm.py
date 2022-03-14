@@ -65,7 +65,7 @@ class WaveForm:
         Returns:
                 [np.linspace]: linear vector"""
         d_tmp = abs(stop - start)
-        if step > (d_temp) or step < 0:
+        if step > (d_tmp) or step < 0:
             raise ValueError("Step size too large or smaller than 0.")
 
         n = math.ceil(d_tmp / step) + 1

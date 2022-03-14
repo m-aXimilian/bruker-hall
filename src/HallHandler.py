@@ -55,8 +55,10 @@ class HallHandler:
         # to prevent an out-of-reach jump
 
         if not self.reach_field_coarse(self.m_hall.set_field[0]) == STATUS.OK:
-            logging.errror("Aborting in %s" % HallHandler.measure_with_wave.__name__)
+            logging.error("Aborting in %s" % HallHandler.measure_with_wave.__name__)
             return
+
+        self.last_b = self.m_hall.set_field[0]
 
         buffer = []
         for v in self.m_hall.set_field:
@@ -90,7 +92,7 @@ class HallHandler:
 
         Returns:
                 [:class:`~STATUS`]: Status info of"""
-        c = abs(b - self.last_b)
+        c = abs(abs(b) - abs(self.last_b))
         if c > self.measure["settings"]["max-inc"]:
             e = "Field increment with {}mT higher than the allowed {}mT".format(
                 c, self.measure["settings"]["max-inc"]
@@ -128,7 +130,7 @@ class HallHandler:
             self.current_field = self.m_hall.read_field()
             delta_tmp = abs(b - self.current_field)
 
-        logging.info("Reached set field of {:10.2f} mT".format(b))
+        logging.debug("Reached set field of {:10.2f} mT".format(b))
         return STATUS.OK
 
     def reach_field_coarse(self, b) -> STATUS:
@@ -149,12 +151,14 @@ class HallHandler:
             logging.error("Power supply to the hall probe turned on???")
             return STATUS.ERROR
 
-        if not b in range(min_b, max_b + 1):
+        if b < min_b or b > max_b:
             raise ValueError("Desired b field not in valid range!")
 
         if (abs(current_field - b)) < tmp_inc:
             return STATUS.OK
 
+        self.last_b = round(current_field)
+        
         reach_vector = WaveForm.linear(round(current_field), b, tmp_inc)
         fine_reach_ok = True
 
