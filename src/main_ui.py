@@ -50,8 +50,8 @@ name_yaml_lookup = {
     "f (Hz)": "f",
     "Sample": "sample",
     "Path": "path",
-    "Max B-field": "max-field",
-    "Min B-field": "min-field",
+    "Max B-field (mT)": "max-field",
+    "Min B-field (mT)": "min-field",
 }
 
 yaml_name_lookup = {v: k for k, v in name_yaml_lookup.items()}
@@ -351,6 +351,11 @@ class MainWidget(QWidget):
 
         self.meas["f"].setRange(0.001, 102000)
         self.meas["f"].setValue(self.default_conf["settings"]["f"])
+
+        self.meas["max-field"].setRange(-10.0, 1000.0)
+        self.meas["max-field"].setValue(self.default_conf["settings"]["max-field"])
+        self.meas["min-field"].setRange(-10.0, 1000.0)
+        self.meas["min-field"].setValue(self.default_conf["settings"]["min-field"])
 
         for v in self.meas.values():
             if isinstance(v, QLineEdit):
