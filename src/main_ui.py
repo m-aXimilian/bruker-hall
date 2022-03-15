@@ -96,6 +96,7 @@ class MainWidget(QWidget):
         xy_row = QHBoxLayout()
         left_col.setSpacing(10)
         conf_button_layout = QHBoxLayout()
+        manual_field_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
         self.field_plot = pg.PlotWidget()
         self.x_plot = pg.PlotWidget()
@@ -114,18 +115,36 @@ class MainWidget(QWidget):
         self.make_config_tabs(self.conf_layout)
         self.make_config_buttons(conf_button_layout)
 
+        # add manual field control
+        self.new_field = QDoubleSpinBox()
+        self.new_field.setRange(-5,500)
+        self.new_field.setSuffix("mT")
+        self.set_field_button = QPushButton("Set and Reach")
+        self.set_field_button.clicked.connect(self.do_reach)
+        manual_field_layout.addWidget(self.new_field)
+        manual_field_layout.addWidget(self.set_field_button)
+
         # add status layout
-        status_layout.addStretch(2)
+        # status_layout.addStretch(2)
         self.show_field_button = QPushButton("Current B-Field (mT)")
         self.show_field_button.clicked.connect(self.show_b)
-        status_layout.addWidget(self.show_field_button)
         self.LCD(status_layout)
+        status_layout.addWidget(self.show_field_button)
+
 
         # glue the left layout (conf and status)
+        left_col.addWidget(QLabel("Configuration"))
         left_col.addLayout(conf_button_layout)
         left_col.addWidget(self.conf_layout)
+        left_col.addStretch()
+        left_col.addWidget(QLabel("Manual B-field set"))
+        left_col.addLayout(manual_field_layout)
+        left_col.addWidget(QLabel("B-field measurement"))
         left_col.addLayout(status_layout)
+        left_col.addStretch()
+        left_col.addWidget(QLabel("Start from configuration"))
         self.make_start_button(left_col)
+        left_col.addStretch()
 
         # glue the right col (plots)
         xy_row.addWidget(self.x_plot)
@@ -141,6 +160,26 @@ class MainWidget(QWidget):
     def connect_devices(self):
         self.m_handler = hall.HallHandler()
 
+    def do_reach(self):
+        self.show_connect_b()
+        self.status_bar_info("Reaching {}mT...".format(self.new_field.value()))
+        self.disable_button(self.start_button)
+        self.disable_button(self.load_conf_button)
+        self.disable_button(self.save_conf_button)
+        self.disable_button(self.set_field_button)
+        r_th = threading.Thread(target=self.reach_thread, args=(self,))
+        r_th.start()
+
+    @staticmethod
+    def reach_thread(r):
+        r.m_handler.reach_field_coarse(r.new_field.value())
+        r.enable_button(r.start_button)
+        r.enable_button(r.load_conf_button)
+        r.enable_button(r.save_conf_button)
+        r.enable_button(r.set_field_button)
+        r.status_bar_info("done.")
+
+    
     def do_measure(self):
         self.m_handler.signaller.new_data_available.connect(self.live_plot)
         self.field_plot.clear()
@@ -152,18 +191,19 @@ class MainWidget(QWidget):
         self.disable_button(self.start_button)
         self.disable_button(self.load_conf_button)
         self.disable_button(self.save_conf_button)
+        self.disable_button(self.set_field_button)
         m_th = threading.Thread(target=self.meas_thread, args=(self,))
         m_th.start()
-
+            
     @staticmethod
     def meas_thread(n):
         n.m_handler.measure_with_wave()
         n.enable_button(n.start_button)
         n.enable_button(n.load_conf_button)
         n.enable_button(n.save_conf_button)
-        n.status_bar_info(
-            "done. \t results saved to: %s" % os.path.abspath(n.m_handler.filename)
-        )
+        n.enable_button(n.set_field_button)
+        n.status_bar_info("done. \t results saved to: %s" %os.path.abspath(n.m_handler.filename))
+     
 
     def show_connect_b(self):
         set_b = lambda: self.b_lcd.display(self.m_handler.current_field)
