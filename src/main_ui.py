@@ -91,6 +91,7 @@ class MainWidget(QWidget):
         xy_row = QHBoxLayout()
         left_col.setSpacing(10)
         conf_button_layout = QHBoxLayout()
+        manual_field_layout = QHBoxLayout()
         status_layout = QHBoxLayout()
         self.field_plot = pg.PlotWidget()
         self.x_plot = pg.PlotWidget()
@@ -109,18 +110,37 @@ class MainWidget(QWidget):
         self.make_config_tabs(self.conf_layout)
         self.make_config_buttons(conf_button_layout)
 
+        # add manual field control
+        self.new_field = QDoubleSpinBox()
+        self.new_field.setRange(-5,500)
+        self.new_field.setSuffix("mT")
+        field_call = lambda : self.m_handler.reach_field_coarse(self.new_field.value())
+        self.set_field_button = QPushButton("Set and Reach")
+        self.set_field_button.clicked.connect(field_call)
+        manual_field_layout.addWidget(self.new_field)
+        manual_field_layout.addWidget(self.set_field_button)
+
         # add status layout
-        status_layout.addStretch(2)
+        # status_layout.addStretch(2)
         self.show_field_button = QPushButton("Current B-Field (mT)")
         self.show_field_button.clicked.connect(self.show_b)
-        status_layout.addWidget(self.show_field_button)
         self.LCD(status_layout)
+        status_layout.addWidget(self.show_field_button)
+
 
         # glue the left layout (conf and status)
+        left_col.addWidget(QLabel("Configuration"))
         left_col.addLayout(conf_button_layout)
         left_col.addWidget(self.conf_layout)
+        left_col.addStretch()
+        left_col.addWidget(QLabel("Manual B-field set"))
+        left_col.addLayout(manual_field_layout)
+        left_col.addWidget(QLabel("B-field measurement"))
         left_col.addLayout(status_layout)
+        left_col.addStretch()
+        left_col.addWidget(QLabel("Start from configuration"))
         self.make_start_button(left_col)
+        left_col.addStretch()
 
         # glue the right col (plots)
         xy_row.addWidget(self.x_plot)
