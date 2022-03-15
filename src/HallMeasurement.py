@@ -162,7 +162,7 @@ class HallMeasurement:
         """Generates a waveform from the values specified in the measurement config based on :class:`~WaveForm`"""
         self.wave_handle = wave.WaveForm(
             self.measure["wave"]["amp"], self.measure["wave"]["N"],
-            self.measure["wave"]["zero"]
+            self.measure["wave"]["zero"], self.measure["wave"]["offset"]
         )
         
         tmp = self.wave_handle.triangle()
