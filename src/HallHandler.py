@@ -43,12 +43,14 @@ class HallHandler:
         self.signaller = UiSignals()
         self.update_id()
 
+
     def update_id(self):
         self.uuid = uuid.uuid1()
 
     def override_measure_config(self, conf):
         self.measure = conf
         self.m_hall = HallMeasurement(self.measure)
+
 
     def measure_with_wave(self):
         # pass the first value of the set-field vector to the reach_field_coarse function
