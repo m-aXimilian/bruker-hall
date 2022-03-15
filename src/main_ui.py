@@ -114,9 +114,8 @@ class MainWidget(QWidget):
         self.new_field = QDoubleSpinBox()
         self.new_field.setRange(-5,500)
         self.new_field.setSuffix("mT")
-        field_call = lambda : self.m_handler.reach_field_coarse(self.new_field.value())
         self.set_field_button = QPushButton("Set and Reach")
-        self.set_field_button.clicked.connect(field_call)
+        self.set_field_button.clicked.connect(self.do_reach)
         manual_field_layout.addWidget(self.new_field)
         manual_field_layout.addWidget(self.set_field_button)
 
@@ -157,6 +156,25 @@ class MainWidget(QWidget):
     def connect_devices(self):
         self.m_handler = hall.HallHandler()
 
+    def do_reach(self):
+        self.show_connect_b()
+        self.status_bar_info("Reaching {}mT...".format(self.new_field.value()))
+        self.disable_button(self.start_button)
+        self.disable_button(self.load_conf_button)
+        self.disable_button(self.save_conf_button)
+        self.disable_button(self.set_field_button)
+        r_th = threading.Thread(target=self.reach_thread, args=(self,))
+        r_th.start()
+
+    @staticmethod
+    def reach_thread(r):
+        r.m_handler.reach_field_coarse(r.new_field.value())
+        r.enable_button(r.start_button)
+        r.enable_button(r.load_conf_button)
+        r.enable_button(r.save_conf_button)
+        r.enable_button(r.set_field_button)
+        r.status_bar_info("done.")
+
     
     def do_measure(self):
         self.m_handler.signaller.new_data_available.connect(self.live_plot)
@@ -169,10 +187,9 @@ class MainWidget(QWidget):
         self.disable_button(self.start_button)
         self.disable_button(self.load_conf_button)
         self.disable_button(self.save_conf_button)
+        self.disable_button(self.set_field_button)
         m_th = threading.Thread(target=self.meas_thread, args=(self,))
         m_th.start()
-
-
             
     @staticmethod
     def meas_thread(n):
@@ -180,6 +197,7 @@ class MainWidget(QWidget):
         n.enable_button(n.start_button)
         n.enable_button(n.load_conf_button)
         n.enable_button(n.save_conf_button)
+        n.enable_button(n.set_field_button)
         n.status_bar_info("done. \t results saved to: %s" %os.path.abspath(n.m_handler.filename))
      
 
