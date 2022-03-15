@@ -14,13 +14,14 @@ from src.HallHandler import HallHandler
 import src.helpers as helper
 from src.States import STATUS, DIRECTION
 
+
 class TimeConstant(HallHandler):
     def __init__(self):
-        if os.name == 'posix':
+        if os.name == "posix":
             self.measure = helper.loadYAMLConfig("../config/measurement.yaml")
         else:
             self.measure = helper.loadYAMLConfig("config/measurement.yaml")
-        
+
         self.steps = self.measure["wave"]["N"]
         self.m_hall = HallMeasurement()
         self.last_b = 0
@@ -32,17 +33,21 @@ class TimeConstant(HallHandler):
             print("reaching {:10.3f}".format(v), end="\r")
             tmp = [self.set_xantrex(v), v]
             res.append(tmp)
-        
-        helper.write_data("tests/results/{}bruker-time-constant_to{}mT.csv".format(strftime("%Y-%m-%d_%H-%M-%S"), upper), np.array(res), "reached-at,set-val")
-            
-            
-            
 
+        helper.write_data(
+            "tests/results/{}bruker-time-constant_to{}mT.csv".format(
+                strftime("%Y-%m-%d_%H-%M-%S"), upper
+            ),
+            np.array(res),
+            "reached-at,set-val",
+        )
 
     def set_xantrex(self, b):
         c = abs(b - self.last_b)
         if c > self.measure["settings"]["max-inc"]:
-            e = "Field increment with {}mT higher than the allowed {}mT".format(c, self.measure["settings"]["max-inc"])
+            e = "Field increment with {}mT higher than the allowed {}mT".format(
+                c, self.measure["settings"]["max-inc"]
+            )
             logging.error(e)
             raise TypeError(e)
 
@@ -51,7 +56,7 @@ class TimeConstant(HallHandler):
         self.last_b = b
 
         self.current_field = self.m_hall.read_field()
-        
+
         start = time.time()
         xan_set = self.m_hall.single_xanterx_set(b, direction)
         self.m_hall.writeVolt(self.m_hall.tasks["xantrex-writer"], xan_set)
@@ -69,5 +74,3 @@ class TimeConstant(HallHandler):
             tmp_diff = abs(self.current_field - self.m_hall.read_field())
 
         return time.time() - start
-    
-        
